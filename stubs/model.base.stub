@@ -1,0 +1,102 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ extends }} as Model;
+use {{ traceEloquent }} as TheTrace;
+use Illuminate\Database\Eloquent\Builder;
+
+{{ usePackages }}
+
+/**
+ * {{ comment }}
+ *
+ * @author KanekiYuto
+*/
+class {{ class }} extends Model
+{
+
+    /**
+     * 追踪类
+     *
+     * @var string
+     */
+    protected string $trace = TheTrace::class;
+
+    /**
+     * 模型表名称
+     *
+     * @var string
+     */
+    protected $table = TheTrace::TABLE;
+
+    /**
+     * 模型主键 ID
+     *
+     * @var string
+     */
+    protected $primaryKey = TheTrace::PRIMARY_KEY;
+
+    /**
+     * 主键是否自增
+     *
+     * @var bool
+     */
+    public $incrementing = {{ incrementing }};
+
+    /**
+     * 指示模型是否主动维护时间戳
+     *
+     * @var bool
+     */
+    public $timestamps = {{ timestamps }};
+
+    /**
+     * 需要被隐藏的列属性
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = TheTrace::HIDDEN;
+
+    /**
+     * 可大量分配的属性
+     *
+     * @var array<string>
+     */
+    protected $fillable = TheTrace::FILLABLE;
+
+    /**
+     * 获取应该强制转换的属性
+     *
+     * @return array
+     */
+    public function casts(): array
+    {
+        {{ casts }}
+    }
+
+    /**
+     * 创建前执行的操作
+     *
+     * @param  Builder  $query
+     *
+     * @return bool
+     */
+    protected function performInsert(Builder $query): bool
+    {
+        return parent::performInsert($query);
+    }
+
+    /**
+     * 执行一个模型更新操作
+     *
+     * @param  Builder  $query
+     *
+     * @return bool
+     */
+    protected function performUpdate(Builder $query): bool
+    {
+        return parent::performUpdate($query);
+    }
+
+}
