@@ -13,7 +13,7 @@
 **Handy** 是一个基于 [Laravel 11](https://github.com/laravel/laravel) 衍生而来的开发框架（或许应该称它为包），在享受原有 Laravel 生态的基础上使用 **Handy** 可以让你
 的开发更加便利。例如使用 `Trace` 可以帮助你更好的定位（**可能变动的字段/列**）的使用情况，或是使用 `Cascade` 快速生成你想要的 `Migration` 、 `Model` 、 `Trace` 等。
 
-## 安装111
+## 安装
 
 ```
 composer require handy/framework
