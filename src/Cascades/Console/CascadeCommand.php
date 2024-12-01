@@ -9,6 +9,7 @@ use KanekiYuto\Handy\Console\ConfirmableTrait;
 use Symfony\Component\Console\Attribute\AsCommand;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\warning;
+use function Laravel\Prompts\info;
 
 #[AsCommand(name: 'handy:cascade')]
 class CascadeCommand extends BaseCommand
