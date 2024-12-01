@@ -4,19 +4,20 @@ namespace KanekiYuto\Handy\Support\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
-use \KanekiYuto\Handy\Preacher\Preacher as PreacherAlias;
+use KanekiYuto\Handy\Preacher\PreacherResponse;
 
 /**
  * Preacher Facade
  *
  * @method static void useMessageActivity(Closure $closure)
- * @method static PreacherAlias base()
- * @method static PreacherAlias msg(string $msg)
- * @method static PreacherAlias code(int $code)
- * @method static PreacherAlias msgCode(int $code, string $msg)
- * @method static PreacherAlias paging(int $page, int $prePage, int $total, array $data)
- * @method static PreacherAlias receipt(object $data)
- * @method static PreacherAlias rows(array $data)
+ * @method static PreacherResponse base()
+ * @method static PreacherResponse msg(string $msg)
+ * @method static PreacherResponse code(int $code)
+ * @method static PreacherResponse msgCode(int $code, string $msg)
+ * @method static PreacherResponse paging(int $page, int $prePage, int $total, array $data)
+ * @method static PreacherResponse receipt(object $data)
+ * @method static PreacherResponse rows(array $data)
+ * @method static PreacherResponse allow(bool $allow, mixed $pass, mixed $noPass, callable $handle = null)
  *
  * @see \KanekiYuto\Handy\Preacher\Builder
  *

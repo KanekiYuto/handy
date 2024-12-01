@@ -33,9 +33,9 @@ readonly class Export
 	 * @return JsonResponse
 	 */
 	public function json(
-		int $status = Preacher::DEFAULT_HTTP_STATUS,
+		int $status = PreacherResponse::DEFAULT_HTTP_STATUS,
 		array $headers = [],
-		int $options = Preacher::DEFAULT_JSON_OPTIONS
+		int $options = PreacherResponse::DEFAULT_JSON_OPTIONS
 	): JsonResponse {
 		return Response::json(self::array(), $status, $headers, $options);
 	}
@@ -62,9 +62,9 @@ readonly class Export
 	 */
 	public function jsonp(
 		string|null $callback = null,
-		int $status = Preacher::DEFAULT_HTTP_STATUS,
+		int $status = PreacherResponse::DEFAULT_HTTP_STATUS,
 		array $headers = [],
-		int $options = Preacher::DEFAULT_JSON_OPTIONS
+		int $options = PreacherResponse::DEFAULT_JSON_OPTIONS
 	): JsonResponse {
 		return Response::jsonp(
 			$callback,

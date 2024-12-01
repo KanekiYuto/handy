@@ -2,7 +2,7 @@
 
 ## 关于 Handy
 
-> **说明:** 该存储库使用前提是 `php` >= **8.2** 并且 <= **8.3**，同时使用的 `Laravel` 版本应该是 >= **11.9**
+> **说明:** 该存储库使用前提是 `php` >= `8.2` 并且 <= `8.3`，同时使用的 `Laravel` 版本应该是 >= `11.9`
 
 **Handy** 商标来自 [logoly](https://www.logoly.pro/) 贡献，特此鸣谢。
 
@@ -18,5 +18,5 @@
 ## 安装
 
 ```
-composer require handy/framework
+composer require handy-fp/framework
 ```

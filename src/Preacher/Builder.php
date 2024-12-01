@@ -32,11 +32,11 @@ class Builder
 	/**
 	 * 返回基础的响应信息
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function base(): Preacher
+	public static function base(): PreacherResponse
 	{
-		return new Preacher(self::getMsgActivity());
+		return new PreacherResponse(self::getMsgActivity());
 	}
 
 	/**
@@ -60,11 +60,11 @@ class Builder
 	 *
 	 * @param  string  $msg
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function msg(string $msg): Preacher
+	public static function msg(string $msg): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setMsg($msg);
 	}
 
@@ -73,11 +73,11 @@ class Builder
 	 *
 	 * @param  int  $code
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function code(int $code): Preacher
+	public static function code(int $code): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setCode($code);
 	}
 
@@ -87,11 +87,11 @@ class Builder
 	 * @param  int     $code
 	 * @param  string  $msg
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function msgCode(int $code, string $msg): Preacher
+	public static function msgCode(int $code, string $msg): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setCode($code)
 			->setMsg($msg);
 	}
@@ -104,11 +104,11 @@ class Builder
 	 * @param  int    $total
 	 * @param  array  $data
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function paging(int $page, int $prePage, int $total, array $data): Preacher
+	public static function paging(int $page, int $prePage, int $total, array $data): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setPaging($page, $prePage, $total, $data);
 	}
 
@@ -117,11 +117,11 @@ class Builder
 	 *
 	 * @param  object  $data
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function receipt(object $data): Preacher
+	public static function receipt(object $data): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setReceipt($data);
 	}
 
@@ -130,12 +130,30 @@ class Builder
 	 *
 	 * @param  array  $data
 	 *
-	 * @return Preacher
+	 * @return PreacherResponse
 	 */
-	public static function rows(array $data): Preacher
+	public static function rows(array $data): PreacherResponse
 	{
-		return (new Preacher(self::getMsgActivity()))
+		return (new PreacherResponse(self::getMsgActivity()))
 			->setRows($data);
+	}
+
+	/**
+	 * 验证并返回预设
+	 *
+	 * @param  bool              $allow
+	 * @param  PreacherResponse  $pass
+	 * @param  PreacherResponse  $noPass
+	 * @param  callable|null     $handle
+	 *
+	 * @return PreacherResponse
+	 */
+	public static function allow(bool $allow, mixed $pass, mixed $noPass, callable $handle = null): mixed {
+		if (!empty($handle)) {
+			call_user_func($handle);
+		}
+
+		return $allow ? $pass : $noPass;
 	}
 
 }
