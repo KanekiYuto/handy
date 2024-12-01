@@ -4,9 +4,9 @@ namespace KanekiYuto\Handy;
 
 use Closure;
 use Illuminate\Support\ServiceProvider;
-use KanekiYuto\Handy\Cascades\Builder;
+use KanekiYuto\Handy\Preacher\Builder;
 use KanekiYuto\Handy\Cascades\Console\CascadeCommand;
-use KanekiYuto\Handy\Support\Facades\Schema;
+use KanekiYuto\Handy\Support\Facades\Preacher;
 
 /**
  * 服务提供者
@@ -34,7 +34,7 @@ class HandyServiceProvider extends ServiceProvider
     {
         $this->registerCommands($this->commands);
 
-        $this->app->bind(Schema::FACADE_ACCESSOR, Builder::class);
+        $this->app->bind(Preacher::FACADE_ACCESSOR, Builder::class);
     }
 
     /**
