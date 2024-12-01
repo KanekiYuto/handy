@@ -10,7 +10,7 @@ use KanekiYuto\Handy\Preacher\Trait\DefaultConst;
  *
  * @author KanekiYuto
  */
-class Preacher
+class PreacherResponse
 {
 
 	use DefaultConst;
