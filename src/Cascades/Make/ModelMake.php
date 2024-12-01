@@ -161,14 +161,4 @@ class ModelMake extends Make
 		return implode("\n", $packages);
 	}
 
-	/**
-	 * 使用 [trait]
-	 *
-	 * @return string
-	 */
-	private function useTrait(): string
-	{
-		return '';
-	}
-
 }

@@ -15,10 +15,8 @@
 	],
 	"require": {
 		"php": "^8.2",
-		"illuminate/support": "^11.9",
-		"illuminate/http": "^11.9",
-		"illuminate/database": "^11.9",
-		"illuminate/console": "^11.9"
+		"laravel/framework": "^11.9",
+		"diverse/support": "dev-main"
 	},
 	"config": {
 		"sort-packages": true,

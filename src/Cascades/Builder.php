@@ -2,14 +2,10 @@
 
 namespace KanekiYuto\Handy\Cascades;
 
-use Closure;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascades\Constants\CascadeConst;
-use KanekiYuto\Handy\Cascades\Make\EloquentTraceMake;
-use KanekiYuto\Handy\Cascades\Make\MigrationMake;
-use KanekiYuto\Handy\Cascades\Make\ModelMake;
 
 /**
  * 构建 - [Builder]
@@ -18,31 +14,6 @@ use KanekiYuto\Handy\Cascades\Make\ModelMake;
  */
 class Builder
 {
-
-    /**
-     * 创建实例
-     *
-     * @param string $table
-     * @param Closure $callback
-     * @param string $comment
-     *
-     * @return void
-     */
-    public static function create(
-        string  $table,
-        Closure $callback,
-        string  $comment = ''
-    ): void
-    {
-        $blueprint = new Blueprint($table, $comment);
-
-        $callback($blueprint);
-
-        // 引导构建
-        (new EloquentTraceMake($blueprint))->boot();
-        (new MigrationMake($blueprint))->boot();
-        (new ModelMake($blueprint))->boot();
-    }
 
     /**
      * 使用文件驱动
