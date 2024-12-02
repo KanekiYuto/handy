@@ -12,7 +12,7 @@ use KanekiYuto\Diverse\Support\IdeIgnore;
 /**
  * 自动的时区转换
  *
- * @todo 需要转移一个包
+ * @todo 需要转移一个包 (IdeIgnore)
  *
  * @author KanekiYuto
  */
