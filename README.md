@@ -1,4 +1,4 @@
-![Handy](/assets/logo.svg)
+![Handy](/assets/logo.png)
 
 ## 关于 Handy
 
