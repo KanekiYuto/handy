@@ -1,21 +1,36 @@
-![Handy](/assets/logo.png)
+<div align="center">
 
-## 关于 Handy
+<img src="assets/logo.png" width="554" alt="handy" />
 
-> **说明:** 该存储库使用前提是 `php` >= `8.2` 并且 <= `8.3`，同时使用的 `Laravel` 版本应该是 >= `11.9`
+**English** | [简体中文](/README-zh_cn.md)
 
-**Handy** 商标来自 [logoly](https://www.logoly.pro/) 贡献，特此鸣谢。
+</div>
 
-**Handy** 遵循 [语义化版本](https://semver.org/) 控制，主要版本每年发布一次（约第一季度），次要版本每月发布一次（1号至5号之间），补丁版本每周发布一次（根据 Issue，和实际情
-况决定），次要版本和补丁版本不会存在重大更改（无法向下兼容的情况）。
+---
 
-从应用程序或包中引入 **Handy** 时，应始终使用版本约束（例如）`^0.0-alpha` / `^0.1`，因为 **Handy** 的主要版本确实包含重大更改。但是，我们始终努力确保您可以第一时间内更新到
-新的主要版本。
+## About Handy
 
-**Handy** 是一个基于 [Laravel 11](https://github.com/laravel/laravel) 衍生而来的开发框架（或许应该称它为包），在享受原有 Laravel 生态的基础上使用 **Handy** 可以让你
-的开发更加便利。例如使用 `Trace` 可以帮助你更好的定位（**可能变动的字段/列**）的使用情况，或是使用 `Cascade` 快速生成你想要的 `Migration` 、 `Model` 、 `Trace` 等。
+> **Note:** The repository is used under the premise that `php` >= `8.2` and <= `8.3`, while the version of `Laravel`
+> used should be >= `11.9`
 
-## 安装
+Thanks for the contribution of the Handy logo from [logoly](https://www.logoly.pro/).
+
+**Handy** follows the [Semantic Versioning](https://semver.org/) control, with major releases released once a year (
+around the first quarter), minor releases released once a month (between the 1st and 5th), and patch releases once a
+week (depending on Issue and availability)
+There will be no major changes to minor and patch versions (cases where backward compatibility is not possible).
+
+When introducing **Handy** from an application or package, you should always use the version constraint (for example)
+`^0.0-alpha` or `^0.1` because the major version of **Handy** does contain significant changes. However, we always
+strive to ensure that you can update to it in the first place
+New major release.
+
+**Handy** is a development framework (maybe it should be called a package) based
+on [Laravel 11](https://github.com/laravel/laravel), and using Handy while enjoying the original Laravel ecosystem can
+make your development easier. For example, using `Trace` can help you better locate the usage of fields or columns that
+may change, or use Cascade to quickly generate the `Migration`, `Model`, `Trace`, etc., you want.
+
+## Install
 
 ```
 composer require handy-fp/framework
