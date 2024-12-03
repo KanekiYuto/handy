@@ -3,80 +3,83 @@
 namespace KanekiYuto\Handy;
 
 use Closure;
-use Illuminate\Support\ServiceProvider;
 use KanekiYuto\Handy\Preacher\Builder;
-use KanekiYuto\Handy\Cascades\Console\CascadeCommand;
+use Illuminate\Support\ServiceProvider;
 use KanekiYuto\Handy\Support\Facades\Preacher;
+use KanekiYuto\Handy\Cascades\Console\CascadeCommand;
 
 /**
- * 服务提供者
+ * Handy service provider
  *
  * @author KanekiYuto
  */
 class HandyServiceProvider extends ServiceProvider
 {
 
-    /**
-     * 命令注册
-     *
-     * @var array
-     */
-    protected array $commands = [
-        CascadeCommand::class,
-    ];
+	/**
+	 * Handy commands
+	 *
+	 * @var array
+	 */
+	protected array $commands = [
+		CascadeCommand::class,
+	];
 
-    /**
-     * 注册服务
-     *
-     * @return void
-     */
-    public function register(): void
-    {
-        $this->registerCommands($this->commands);
+	/**
+	 * Register service
+	 *
+	 * @return void
+	 */
+	public function register(): void
+	{
+		$this->registerCommands($this->commands);
 
-        $this->app->bind(Preacher::FACADE_ACCESSOR, Builder::class);
-    }
+		$this->app->bind(Preacher::FACADE_ACCESSOR, Builder::class);
+	}
 
-    /**
-     * 注册给定的命令
-     *
-     * @param array $commands
-     *
-     * @return void
-     */
-    protected function registerCommands(array $commands): void
-    {
-        foreach ($commands as $command) {
-            $this->app->singleton($command, $this->matchCommand($command));
-        }
+	/**
+	 * Register the given command
+	 *
+	 * @param  array  $commands
+	 *
+	 * @return void
+	 */
+	protected function registerCommands(array $commands): void
+	{
+		foreach ($commands as $command) {
+			$this->app->singleton($command, $this->matchCommand($command));
+		}
 
-        $this->commands(array_values($commands));
-    }
+		$this->commands(array_values($commands));
+	}
 
-    /**
-     * 匹配对应的命令函数
-     *
-     * @param string $className
-     *
-     * @return Closure
-     */
-    protected function matchCommand(string $className): Closure
-    {
-        return match ($className) {
-            CascadeCommand::class => function () {
-                return new CascadeCommand();
-            }
-        };
-    }
+	/**
+	 * Matches the corresponding command function
+	 *
+	 * @param  string  $className
+	 *
+	 * @return Closure
+	 */
+	protected function matchCommand(string $className): Closure
+	{
+		return match ($className) {
+			CascadeCommand::class => function () {
+				return new CascadeCommand();
+			},
+			default => function () {
+				return null;
+			}
+		};
+	}
 
-    /**
-     * 引导服务
-     *
-     * @return void
-     */
-    public function boot()
-    {
-        // ...
-    }
+	/**
+	 * Bootstrap service
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+		// ...
+	}
 
 }
