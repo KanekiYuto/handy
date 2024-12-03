@@ -2,14 +2,14 @@
 
 namespace KanekiYuto\Handy\Cascades\Console;
 
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascades\Cascade;
-use KanekiYuto\Handy\Console\ConfirmableTrait;
 use Symfony\Component\Console\Attribute\AsCommand;
+use KanekiYuto\Handy\Console\Trait\ConfirmableTrait;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\warning;
-use function Laravel\Prompts\info;
 
 #[AsCommand(name: 'handy:cascade')]
 class CascadeCommand extends BaseCommand

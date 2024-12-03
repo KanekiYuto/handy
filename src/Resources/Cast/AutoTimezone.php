@@ -1,6 +1,6 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascades\Casts;
+namespace KanekiYuto\Handy\Resources\Cast;
 
 use DateTimeImmutable;
 use DateTimeZone;
@@ -10,9 +10,7 @@ use Illuminate\Support\Facades\Request;
 use KanekiYuto\Diverse\Support\IdeIgnore;
 
 /**
- * 自动的时区转换
- *
- * @todo 需要转移一个包 (IdeIgnore)
+ * Automatic time zone switching
  *
  * @author KanekiYuto
  */
@@ -20,7 +18,7 @@ class AutoTimezone
 {
 
     /**
-     * 将取出的数据进行转换
+     * The extracted data is converted
      *
      * @param  Model  $model
      * @param  string  $key
@@ -44,7 +42,7 @@ class AutoTimezone
     }
 
     /**
-     * 转换成将要进行存储的值
+     * Convert to a value that will be stored
      *
      * @param  Model  $model
      * @param  string  $key

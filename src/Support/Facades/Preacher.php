@@ -27,21 +27,21 @@ class Preacher extends Facade
 {
 
     /**
-     * Facade 访问名称
+     * Facade accessor
      *
      * @var string
      */
     const FACADE_ACCESSOR = 'handy.preacher';
 
     /**
-     * 指示是否应缓存已解析的 Facade
+     * Indicates whether the parsed Facade should be cached
      *
      * @var bool
      */
     protected static $cached = false;
 
     /**
-     * 获取组件的注册名称
+     * Gets the registered name of the component
      *
      * @return string
      */

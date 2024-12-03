@@ -5,7 +5,7 @@ namespace KanekiYuto\Handy\Trace;
 use ReflectionClass;
 
 /**
- * 追踪 [laravel Eloquent ORM]
+ * Trace [laravel Eloquent ORM]
  *
  * @author KanekiYuto
  */
@@ -13,7 +13,7 @@ abstract class TraceEloquent
 {
 
     /**
-     * 获取所有列名称
+     * Gets all column names [hidden and table not included]
      *
      * @return array
      */
@@ -27,7 +27,7 @@ abstract class TraceEloquent
     }
 
     /**
-     * 获取所有子类常量
+     * Gets all subclass constants
      *
      * @return array
      */
