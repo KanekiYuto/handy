@@ -5,6 +5,7 @@ namespace KanekiYuto\Handy\Cascade\Make;
 use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
+use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
 
@@ -14,6 +15,8 @@ class Make
     use Template;
 
     protected string $stub;
+
+    protected ConfigureParams $configureParams;
 
     protected TableParams $tableParams;
 
@@ -26,17 +29,20 @@ class Make
     /**
      * construct
      *
+     * @param  ConfigureParams  $configureParams
      * @param  BlueprintParams  $blueprintParams
      * @param  TableParams      $tableParams
      * @param  ModelParams      $modelParams
      * @param  MigrationParams  $migrationParams
      */
     public function __construct(
+        ConfigureParams $configureParams,
         BlueprintParams $blueprintParams,
         TableParams $tableParams,
         ModelParams $modelParams,
         MigrationParams $migrationParams
     ) {
+        $this->configureParams = $configureParams;
         $this->blueprintParams = $blueprintParams;
         $this->migrationParams = $migrationParams;
         $this->tableParams = $tableParams;
@@ -133,6 +139,29 @@ class Make
         if (!empty($stub)) {
             $this->stub = $stub;
         }
+    }
+
+    protected function getConfigureNamespace(array $values): string
+    {
+        return implode('\\', [
+            $this->configureParams->getAppNamespace(),
+            $this->configureParams->getCascadeNamespace(),
+            ...$values,
+        ]);
+    }
+
+    protected final function getNamespace(): string
+    {
+        $table = $this->tableParams->getTable();
+
+        $table = explode('_', $table);
+        $table = collect($table)
+            ->except([count($table) - 1])
+            ->all();
+
+        $table = implode('\\', $table);
+
+        return Str::headline($table);
     }
 
     /**

@@ -43,22 +43,30 @@ class EloquentTraceMake extends Make
             return;
         }
 
-        $configure = new Configure();
-
         $table = $this->blueprintParams->getTable();
         $className = $this->getDefaultClassName('Trace');
 
         $this->param('class', $className);
         $this->param('table', $table);
 
-        $this->param('namespace', $this->getDefaultNamespace([
-            $configure->getEloquentTrace()->getNamespace(),
+        $this->param('namespace', $this->getConfigureNamespace([
+            $this->getNamespace(),
         ]));
 
         $this->param('primaryKey', 'self::ID');
         $this->param('columns', $this->makeColumns());
         $this->param('hidden', $this->makeHidden());
         $this->param('fillable', $this->makeFillable());
+
+        echo $this->stub;
+    }
+
+    protected function getConfigureNamespace(array $values): string
+    {
+        return parent::getConfigureNamespace([
+            $this->configureParams->getEloquentTrace()->getNamespace(),
+            ...$values,
+        ]);
     }
 
     /**

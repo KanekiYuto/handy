@@ -8,8 +8,8 @@ use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
+use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
-
 
 /**
  * Cascade
@@ -18,6 +18,8 @@ use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
  */
 class Cascade
 {
+
+    protected ConfigureParams $configureParams;
 
     private TableParams $tableParams;
 
@@ -34,6 +36,7 @@ class Cascade
      */
     private function __construct()
     {
+        $this->configureParams = new ConfigureParams();
         $this->tableParams = new TableParams('default', '');
         $this->migrationParams = new MigrationParams(null, '');
         $this->modelParams = new ModelParams('', false, false);
@@ -132,6 +135,7 @@ class Cascade
         $blueprintCallable(new Blueprint($this->blueprintParams));
 
         (new MigrationMake(
+            $this->configureParams,
             $this->blueprintParams,
             $this->tableParams,
             $this->modelParams,
@@ -139,6 +143,7 @@ class Cascade
         ))->boot();
 
         (new EloquentTraceMake(
+            $this->configureParams,
             $this->blueprintParams,
             $this->tableParams,
             $this->modelParams,
