@@ -135,7 +135,15 @@ class Make
         }
     }
 
-    protected final function getDefaultNamespace(array $prefix, string $className): string
+    /**
+     * 获取默认的命名空间
+     *
+     * @param  array  $prefix
+     * @param  array  $suffix
+     *
+     * @return string
+     */
+    protected final function getDefaultNamespace(array $prefix, array $suffix = []): string
     {
         $table = $this->tableParams->getTable();
 
@@ -151,7 +159,7 @@ class Make
             'App\\Cascade',
             ...$prefix,
             $table,
-            $className,
+            ...$suffix,
         ]);
     }
 

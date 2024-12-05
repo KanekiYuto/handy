@@ -4,6 +4,7 @@ namespace KanekiYuto\Handy\Cascade;
 
 use Closure;
 use KanekiYuto\Handy\Cascade\Make\MigrationMake;
+use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
@@ -131,6 +132,13 @@ class Cascade
         $blueprintCallable(new Blueprint($this->blueprintParams));
 
         (new MigrationMake(
+            $this->blueprintParams,
+            $this->tableParams,
+            $this->modelParams,
+            $this->migrationParams
+        ))->boot();
+
+        (new EloquentTraceMake(
             $this->blueprintParams,
             $this->tableParams,
             $this->modelParams,

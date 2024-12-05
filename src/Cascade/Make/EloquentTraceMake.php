@@ -2,6 +2,7 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Disk;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
@@ -43,12 +44,64 @@ class EloquentTraceMake extends Make
         $table = $this->blueprintParams->getTable();
         $className = $this->getDefaultClassName('Trace');
 
-        $this->param('class', $this->makeClassName());
+        $this->param('class', $className);
+        $this->param('table', $table);
+
+        $this->param('namespace', $this->getDefaultNamespace([
+            'Trace',
+            'Eloquent',
+        ]));
+
+        $this->param('primaryKey', 'self::ID');
+        $this->param('columns', $this->columns());
+
+        $hidden = collect($this->hidden)->map(function (string $value) {
+            return "self::$value";
+        })->all();
+
+        $this->param('hidden', implode(', ', $hidden));
+
+        $fillable = collect($this->fillable)->map(function (string $value) {
+            return "self::$value";
+        })->all();
+
+        $this->param('fillable', implode(', ', $fillable));
+
+        echo $this->stub;
     }
 
-    public function makeClassName(): string
+    /**
+     * 处理列数据
+     *
+     * @return string
+     */
+    private function columns(): string
     {
-        return $this->getDefaultClassName('Trace');
+        $columns = $this->blueprint->getColumns();
+        $templates = [];
+
+        foreach ($columns as $column) {
+            $columnDefinition = $column->getColumnParams();
+            $template = [];
+
+            $field = $columnDefinition->getField();
+            $constantCode = Str::of($field)->upper();
+
+            $template[] = $this->templatePropertyComment($columnDefinition->getComment(), 'string');
+            $template[] = $this->templateConst($constantCode, $field);
+            $template = implode("", $template);
+
+            // 判断该列是否标记为隐藏
+            if ($columnDefinition->isHide()) {
+                $this->hidden[] = $constantCode;
+            } else {
+                $this->fillable[] = $constantCode;
+            }
+
+            $templates[] = $template;
+        }
+
+        return $this->tab(implode("\n", $templates), 1);
     }
 
 }
