@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Disk;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 use function Laravel\Prompts\note;
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\error;
 
 class MigrationMake extends Make
@@ -29,12 +30,24 @@ class MigrationMake extends Make
             return;
         }
 
+        $table = $this->tableParams->getTable();
+
         $this->param('traceEloquent', $this->getDefaultNamespace([
             'Trace', 'Eloquent',
         ]));
 
         $this->param('comment', $this->migrationParams->getComment());
         $this->param('blueprint', $this->makeColumns());
+
+        $folderDisk = Disk::migrationDisk();
+        $fileName = $this->filename("cascade_create_{$table}_table.");
+
+        if (!$folderDisk->put($fileName, $this->stub)) {
+            error('创建失败...写入文件失败！');
+            return;
+        }
+
+        info('创建...完成！');
 
         echo $this->stub;
     }

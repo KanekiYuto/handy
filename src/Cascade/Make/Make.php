@@ -154,4 +154,17 @@ class Make
         return $namespace . '\\' . $table;
     }
 
+    /**
+     * get the filename
+     *
+     * @param string $filename
+     * @param string $suffix
+     *
+     * @return string
+     */
+    protected final function filename(string $filename, string $suffix = 'php'): string
+    {
+        return "$filename.$suffix";
+    }
+
 }
