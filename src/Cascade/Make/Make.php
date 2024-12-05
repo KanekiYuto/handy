@@ -146,21 +146,6 @@ class Make
         }
     }
 
-    protected function run(string $name, string $stub, Closure $callable): void
-    {
-        note("开始构建 $name...");
-
-        $stubsDisk = DiskManager::stubDisk();
-        $this->load($stubsDisk->get($stub));
-
-        if (empty($this->stub)) {
-            error('创建失败...存根无效或不存在...');
-            return;
-        }
-
-        $callable();
-    }
-
     public function getConfigureNamespace(array $values): string
     {
         return implode('\\', [
@@ -182,6 +167,30 @@ class Make
         $table = implode('\\', $table);
 
         return Str::headline($table);
+    }
+
+    /**
+     * 运行构建
+     *
+     * @param  string   $name
+     * @param  string   $stub
+     * @param  Closure  $callable
+     *
+     * @return void
+     */
+    protected function run(string $name, string $stub, Closure $callable): void
+    {
+        note("开始构建 $name...");
+
+        $stubsDisk = DiskManager::stubDisk();
+        $this->load($stubsDisk->get($stub));
+
+        if (empty($this->stub)) {
+            error('创建失败...存根无效或不存在...');
+            return;
+        }
+
+        $callable();
     }
 
     protected function cascadeDisk(array $values): Filesystem

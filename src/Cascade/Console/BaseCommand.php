@@ -3,8 +3,8 @@
 namespace KanekiYuto\Handy\Cascade\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 /**
  * Base Command

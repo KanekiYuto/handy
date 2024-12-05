@@ -2,26 +2,104 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
-use KanekiYuto\Handy\Cascade\DiskManager;
-use function Laravel\Prompts\note;
-use function Laravel\Prompts\error;
-
 class ModelMake extends Make
 {
 
-    public function boot()
+    private array $casts = [];
+
+    private array $packages = [];
+
+    public function boot(): void
     {
-        note('开始创建 Model...');
+        $this->run('Model', 'model.base.stub', function () {
+            $className = $this->getClassName();
 
-        $stubsDisk = DiskManager::stubDisk();
-        $this->load($stubsDisk->get('model.base.stub'));
+            $this->param('namespace', $this->getConfigureNamespace([
+                $this->getNamespace(),
+            ]));
 
-        if (empty($this->stub)) {
-            error('创建失败...存根无效或不存在...');
-            return;
+            $this->param('class', $className);
+            $this->param('comment', '');
+
+            $this->param('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->param('timestamps', $this->modelParams->getTimestamps());
+            $this->param('incrementing', $this->modelParams->getIncrementing());
+            $this->param('extends', $this->modelParams->getExtends());
+
+            $this->param('casts', $this->makeCasts());
+            $this->param('usePackages', $this->makeUsePackages());
+
+            $this->stub = $this->formattingStub($this->stub);
+
+            echo $this->stub;
+        });
+    }
+
+    public function getClassName(): string
+    {
+        return $this->getDefaultClassName('Model');
+    }
+
+    public function getConfigureNamespace(array $values): string
+    {
+        return parent::getConfigureNamespace([
+            $this->configureParams->getModel()->getNamespace(),
+            ...$values,
+        ]);
+    }
+
+    public function getTraceEloquentNamespace(): string
+    {
+        $make = $this->getTraceEloquent();
+
+        return $make->getConfigureNamespace([
+            $make->getNamespace(),
+            $make->getClassName(),
+        ]);
+    }
+
+    private function makeCasts(): string
+    {
+        if (empty($this->casts)) {
+            return 'return array_merge(parent::casts(), []);';
         }
 
+        $templates[] = 'return array_merge(parent::casts(), [';
 
+        $casts = collect($this->casts)->map(function (string $value, string $key) {
+
+            if (class_exists($value)) {
+                $namespace = explode('\\', $value);
+                $className = $namespace[count($namespace) - 1];
+                $value = "$className::class";
+                $this->addPackage(implode('\\', $namespace));
+            } else {
+                $value = "'$value'";
+            }
+
+            return "\t$key => $value,";
+        })->all();
+
+        $templates = array_merge($templates, $casts);
+        $templates[] = ']);';
+
+        return implode("\n\t\t", $templates);
+    }
+
+    private function addPackage(string $value): void
+    {
+        if (!in_array($value, $this->packages)) {
+            $this->packages[] = $value;
+        }
+    }
+
+    private function makeUsePackages(): string
+    {
+        $packages = collect($this->packages)->map(function (string $value) {
+            return "use $value;";
+        })->all();
+
+        return implode("\n", $packages);
     }
 
 }

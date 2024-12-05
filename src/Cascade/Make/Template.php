@@ -86,6 +86,13 @@ trait Template
         );
     }
 
+    /**
+     * 存根代码格式化
+     *
+     * @param  string  $stub
+     *
+     * @return string
+     */
     protected final function formattingStub(string $stub): string
     {
         $stubArray = explode("\n", $stub);
