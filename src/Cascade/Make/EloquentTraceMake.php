@@ -4,6 +4,7 @@ namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Disk;
+use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
 
@@ -53,7 +54,7 @@ class EloquentTraceMake extends Make
         ]));
 
         $this->param('primaryKey', 'self::ID');
-        $this->param('columns', $this->columns());
+        $this->param('columns', $this->makeColumns());
 
         $hidden = collect($this->hidden)->map(function (string $value) {
             return "self::$value";
@@ -70,38 +71,36 @@ class EloquentTraceMake extends Make
         echo $this->stub;
     }
 
-    /**
-     * 处理列数据
-     *
-     * @return string
-     */
-    private function columns(): string
+    private function makeColumns(): string
     {
-        $columns = $this->blueprint->getColumns();
+        $columns = $this->blueprintParams->getColumns();
         $templates = [];
 
         foreach ($columns as $column) {
-            $columnDefinition = $column->getColumnParams();
-            $template = [];
-
-            $field = $columnDefinition->getField();
-            $constantCode = Str::of($field)->upper();
-
-            $template[] = $this->templatePropertyComment($columnDefinition->getComment(), 'string');
-            $template[] = $this->templateConst($constantCode, $field);
-            $template = implode("", $template);
-
-            // 判断该列是否标记为隐藏
-            if ($columnDefinition->isHide()) {
-                $this->hidden[] = $constantCode;
-            } else {
-                $this->fillable[] = $constantCode;
-            }
-
-            $templates[] = $template;
+            $templates[] = $this->makeColumn($column);
         }
 
         return $this->tab(implode("\n", $templates), 1);
+    }
+
+    private function makeColumn(ColumnParams $column): string
+    {
+        $template = [];
+
+        $field = $column->getField();
+        $constantName = Str::of($field)->upper()->toString();
+
+        $template[] = $this->templatePropertyComment($column->getComment(), 'string');
+        $template[] = $this->templateConst($constantName, $field);
+        $template = implode('', $template);
+
+        if ($column->isHide()) {
+            $this->hidden[] = $constantName;
+        } else {
+            $this->fillable[] = $constantName;
+        }
+
+        return $template;
     }
 
 }
