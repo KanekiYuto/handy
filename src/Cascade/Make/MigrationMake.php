@@ -50,8 +50,6 @@ class MigrationMake extends Make
         }
 
         info('创建...完成！');
-
-        echo $this->stub;
     }
 
     /**

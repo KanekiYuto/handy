@@ -4,6 +4,7 @@ namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Disk;
+use KanekiYuto\Handy\Cascade\Params\Configure;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
@@ -35,12 +36,14 @@ class EloquentTraceMake extends Make
         note('开始创建 Eloquent Trace...');
 
         $stubsDisk = Disk::stubDisk();
-        $this->load($stubsDisk->get('migration.stub'));
+        $this->load($stubsDisk->get('eloquent-trace.stub'));
 
         if (empty($this->stub)) {
             error('创建失败...存根无效或不存在...');
             return;
         }
+
+        $configure = new Configure();
 
         $table = $this->blueprintParams->getTable();
         $className = $this->getDefaultClassName('Trace');
@@ -49,28 +52,20 @@ class EloquentTraceMake extends Make
         $this->param('table', $table);
 
         $this->param('namespace', $this->getDefaultNamespace([
-            'Trace',
-            'Eloquent',
+            $configure->getEloquentTrace()->getNamespace(),
         ]));
 
         $this->param('primaryKey', 'self::ID');
         $this->param('columns', $this->makeColumns());
-
-        $hidden = collect($this->hidden)->map(function (string $value) {
-            return "self::$value";
-        })->all();
-
-        $this->param('hidden', implode(', ', $hidden));
-
-        $fillable = collect($this->fillable)->map(function (string $value) {
-            return "self::$value";
-        })->all();
-
-        $this->param('fillable', implode(', ', $fillable));
-
-        echo $this->stub;
+        $this->param('hidden', $this->makeHidden());
+        $this->param('fillable', $this->makeFillable());
     }
 
+    /**
+     * 构建所有列信息
+     *
+     * @return string
+     */
     private function makeColumns(): string
     {
         $columns = $this->blueprintParams->getColumns();
@@ -83,6 +78,13 @@ class EloquentTraceMake extends Make
         return $this->tab(implode("\n", $templates), 1);
     }
 
+    /**
+     * 构建列参数
+     *
+     * @param  ColumnParams  $column
+     *
+     * @return string
+     */
     private function makeColumn(ColumnParams $column): string
     {
         $template = [];
@@ -101,6 +103,24 @@ class EloquentTraceMake extends Make
         }
 
         return $template;
+    }
+
+    public function makeHidden(): string
+    {
+        $hidden = collect($this->hidden)->map(function (string $value) {
+            return "self::$value";
+        })->all();
+
+        return implode(', ', $hidden);
+    }
+
+    public function makeFillable(): string
+    {
+        $fillable = collect($this->fillable)->map(function (string $value) {
+            return "self::$value";
+        })->all();
+
+        return implode(', ', $fillable);
     }
 
 }
