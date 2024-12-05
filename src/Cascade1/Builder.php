@@ -2,9 +2,9 @@
 
 namespace KanekiYuto\Handy\Cascade1;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade1\Constants\CascadeConst;
 
 /**
@@ -18,7 +18,8 @@ class Builder
     /**
      * 使用文件驱动
      *
-     * @param string $root
+     * @param  string  $root
+     *
      * @return Filesystem
      */
     public static function useDisk(string $root): Filesystem
@@ -77,7 +78,7 @@ class Builder
     /**
      * 命名空间转换文件路径
      *
-     * @param string $namespace
+     * @param  string  $namespace
      *
      * @return string
      */

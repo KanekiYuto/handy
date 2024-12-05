@@ -1,0 +1,111 @@
+<?php
+
+namespace KanekiYuto\Handy\Cascade\Make;
+
+use Illuminate\Support\Str;
+use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
+use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
+use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
+use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
+
+class Make
+{
+
+    use Template;
+
+    protected string $stub;
+
+    protected TableParams $tableParams;
+
+    protected MigrationParams $migrationParams;
+
+    protected ModelParams $modelParams;
+
+    protected BlueprintParams $blueprintParams;
+
+    /**
+     * construct
+     *
+     * @param  BlueprintParams  $blueprintParams
+     * @param  TableParams      $tableParams
+     * @param  ModelParams      $modelParams
+     * @param  MigrationParams  $migrationParams
+     */
+    public function __construct(
+        BlueprintParams $blueprintParams,
+        TableParams $tableParams,
+        ModelParams $modelParams,
+        MigrationParams $migrationParams
+    ) {
+        $this->blueprintParams = $blueprintParams;
+        $this->migrationParams = $migrationParams;
+        $this->tableParams = $tableParams;
+        $this->modelParams = $modelParams;
+    }
+
+    /**
+     * load param to the stub
+     *
+     * @param  string       $param
+     * @param  string|bool  $value
+     *
+     * @return string
+     */
+    public function param(string $param, string|bool $value): string
+    {
+        $value = match (gettype($value)) {
+            'boolean' => $this->boolConvertString($value),
+            default => $value
+        };
+
+        return $this->replace("{{ $param }}", $value);
+    }
+
+    /**
+     * 布尔值转换成字符串
+     *
+     * @param  bool  $bool
+     *
+     * @return string
+     */
+    protected final function boolConvertString(bool $bool): string
+    {
+        return $bool ? 'true' : 'false';
+    }
+
+    /**
+     * 字符串替换
+     *
+     * @param  string       $search
+     * @param  string       $replace
+     * @param  string|null  $stub
+     *
+     * @return string
+     */
+    protected final function replace(string $search, string $replace, string $stub = null): string
+    {
+        if (empty($stub)) {
+            $stub = $this->stub;
+        }
+
+        return Str::of($stub)
+            ->replace($search, $replace)
+            ->toString();
+    }
+
+    /**
+     * load stub
+     *
+     * @param  string|null  $stub
+     *
+     * @return void
+     */
+    protected final function load(string|null $stub): void
+    {
+        if (!empty($stub)) {
+            $this->stub = $stub;
+        }
+    }
+
+
+}

@@ -11,6 +11,9 @@ class Column
 
 	private string $comment;
 
+    /**
+     * @var MigrationParams[]
+    */
 	private array $migrationParams;
 
 	private bool $hide;

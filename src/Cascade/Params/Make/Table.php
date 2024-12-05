@@ -1,8 +1,8 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Params;
+namespace KanekiYuto\Handy\Cascade\Params\Make;
 
-class DatabaseTable
+class Table
 {
 
 	private string $table;

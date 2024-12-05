@@ -1,6 +1,6 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Params;
+namespace KanekiYuto\Handy\Cascade\Params\Make;
 
 class Model
 {

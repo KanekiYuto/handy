@@ -14,6 +14,10 @@ class Blueprint
 
 	private Closure $callable;
 
+    /**
+     *
+     * @var ColumnParams[]
+    */
 	private array $columns;
 
 	public function __construct(string $table, string $comment, Closure $callable)
