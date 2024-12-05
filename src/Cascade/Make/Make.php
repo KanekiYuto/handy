@@ -3,6 +3,8 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
+use KanekiYuto\Handy\Cascade\Disk;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
@@ -162,6 +164,15 @@ class Make
         $table = implode('\\', $table);
 
         return Str::headline($table);
+    }
+
+    protected function cascadeDisk(array $values): Filesystem
+    {
+        return Disk::useDisk(implode(DIRECTORY_SEPARATOR, [
+            $this->configureParams->getAppFilepath(),
+            $this->configureParams->getCascadeFilepath(),
+            ...$values,
+        ]));
     }
 
     /**

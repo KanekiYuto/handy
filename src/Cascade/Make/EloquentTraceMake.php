@@ -4,7 +4,7 @@ namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\Disk;
-use KanekiYuto\Handy\Cascade\Params\Configure;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
@@ -59,6 +59,10 @@ class EloquentTraceMake extends Make
         $this->param('fillable', $this->makeFillable());
 
         echo $this->stub;
+
+        $this->cascadeDisk([
+            $this->getNamespace(),
+        ])->put($this->filename($className), $this->stub);
     }
 
     protected function getConfigureNamespace(array $values): string
@@ -129,6 +133,14 @@ class EloquentTraceMake extends Make
         })->all();
 
         return implode(', ', $fillable);
+    }
+
+    protected function cascadeDisk(array $values): Filesystem
+    {
+        return parent::cascadeDisk([
+            $this->configureParams->getEloquentTrace()->getFilepath(),
+            ...$values,
+        ]);
     }
 
 }
