@@ -23,6 +23,16 @@ class Cascade
 	private BlueprintParams $blueprintParams;
 
 	/**
+	 * 配置信息
+	 *
+	 * @return static
+	 */
+	public static function configure(): static
+	{
+		return new static();
+	}
+
+	/**
 	 * 创建一个 [Cascade] 实例
 	 *
 	 * @return void
