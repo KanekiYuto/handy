@@ -10,9 +10,7 @@ class Disk
 
     public static function migrationDisk(): Filesystem
     {
-        $database = database_path() . DIRECTORY_SEPARATOR;
-
-        return static::useDisk($database . 'migrations');
+        return static::useDisk(self::getMigrationPath());
     }
 
     public static function useDisk(string $root): Filesystem
@@ -23,18 +21,29 @@ class Disk
         ]);
     }
 
+    public static function getMigrationPath(): string
+    {
+        return database_path() . DIRECTORY_SEPARATOR . 'migrations';
+    }
+
     public static function appDisk(): Filesystem
     {
-        $base = base_path() . DIRECTORY_SEPARATOR;
+        return static::useDisk(self::getAppPath());
+    }
 
-        return static::useDisk($base . 'app');
+    public static function getAppPath(): string
+    {
+        return base_path() . DIRECTORY_SEPARATOR . 'app';
     }
 
     public static function stubDisk(): Filesystem
     {
-        $base = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+        return static::useDisk(self::getStubPath());
+    }
 
-        return static::useDisk($base . 'stubs');
+    public static function getStubPath(): string
+    {
+        return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'stubs';
     }
 
 }

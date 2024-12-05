@@ -139,7 +139,7 @@ class Make
     {
         $table = $this->tableParams->getTable();
         $namespace = implode('\\', [
-            'Cascade',
+            'App\\Cascade',
             ...$namespace,
         ]);
 
@@ -157,8 +157,8 @@ class Make
     /**
      * get the filename
      *
-     * @param string $filename
-     * @param string $suffix
+     * @param  string  $filename
+     * @param  string  $suffix
      *
      * @return string
      */

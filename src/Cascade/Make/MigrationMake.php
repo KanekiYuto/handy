@@ -33,14 +33,16 @@ class MigrationMake extends Make
         $table = $this->tableParams->getTable();
 
         $this->param('traceEloquent', $this->getDefaultNamespace([
-            'Trace', 'Eloquent',
+            'Trace',
+            'Eloquent',
+            $this->getDefaultClassName('Trace'),
         ]));
 
         $this->param('comment', $this->migrationParams->getComment());
         $this->param('blueprint', $this->makeColumns());
 
         $folderDisk = Disk::migrationDisk();
-        $fileName = $this->filename("cascade_create_{$table}_table.");
+        $fileName = $this->filename("cascade_create_{$table}_table");
 
         if (!$folderDisk->put($fileName, $this->stub)) {
             error('创建失败...写入文件失败！');
