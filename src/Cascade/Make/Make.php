@@ -48,17 +48,25 @@ class Make
      *
      * @param  string       $param
      * @param  string|bool  $value
+     * @param  bool         $load
+     * @param  string|null  $stub
      *
      * @return string
      */
-    public function param(string $param, string|bool $value): string
+    public function param(string $param, string|bool $value, bool $load = true, string $stub = null): string
     {
         $value = match (gettype($value)) {
             'boolean' => $this->boolConvertString($value),
             default => $value
         };
 
-        return $this->replace("{{ $param }}", $value);
+        $replaceStub = $this->replace("{{ $param }}", $value, $stub);
+
+        if ($load) {
+            $this->load($replaceStub);
+        }
+
+        return $replaceStub;
     }
 
     /**
