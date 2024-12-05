@@ -35,8 +35,7 @@ class MigrationMake extends Make
         $this->param('traceEloquent', $this->getDefaultNamespace([
             'Trace',
             'Eloquent',
-            $this->getDefaultClassName('Trace'),
-        ]));
+        ], $this->getDefaultClassName('Trace')));
 
         $this->param('comment', $this->migrationParams->getComment());
         $this->param('blueprint', $this->makeColumns());

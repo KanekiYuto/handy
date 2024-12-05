@@ -135,13 +135,9 @@ class Make
         }
     }
 
-    protected final function getDefaultNamespace(array $namespace): string
+    protected final function getDefaultNamespace(array $prefix, string $className): string
     {
         $table = $this->tableParams->getTable();
-        $namespace = implode('\\', [
-            'App\\Cascade',
-            ...$namespace,
-        ]);
 
         $table = explode('_', $table);
         $table = collect($table)
@@ -151,7 +147,12 @@ class Make
         $table = implode('\\', $table);
         $table = Str::headline($table);
 
-        return $namespace . '\\' . $table;
+        return implode('\\', [
+            'App\\Cascade',
+            ...$prefix,
+            $table,
+            $className,
+        ]);
     }
 
     /**
