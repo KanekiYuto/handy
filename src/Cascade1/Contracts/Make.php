@@ -1,6 +1,6 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Contracts;
+namespace KanekiYuto\Handy\Cascade1\Contracts;
 
 interface Make
 {

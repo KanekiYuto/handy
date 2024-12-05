@@ -1,9 +1,9 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Make;
+namespace KanekiYuto\Handy\Cascade1\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
+use KanekiYuto\Handy\Cascade1\Builder;
 
 /**
  * 存根模板

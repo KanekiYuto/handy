@@ -6,7 +6,7 @@ use Closure;
 use KanekiYuto\Handy\Preacher\Builder;
 use Illuminate\Support\ServiceProvider;
 use KanekiYuto\Handy\Support\Facades\Preacher;
-use KanekiYuto\Handy\Cascade\Console\CascadeCommand;
+use KanekiYuto\Handy\Cascade1\Console\CascadeCommand;
 
 /**
  * Handy service provider

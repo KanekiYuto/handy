@@ -1,10 +1,10 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Trait;
+namespace KanekiYuto\Handy\Cascade1\Trait;
 
 use Illuminate\Contracts\Database\Query\Expression;
-use KanekiYuto\Handy\Cascade\ColumnDefinition;
-use KanekiYuto\Handy\Cascade\Constants\DefaultColumnParams;
+use KanekiYuto\Handy\Cascade1\ColumnDefinition;
+use KanekiYuto\Handy\Cascade1\Constants\DefaultColumnParams;
 
 trait LaravelColumnDefinition
 {

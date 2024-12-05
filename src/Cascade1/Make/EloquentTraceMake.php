@@ -1,10 +1,10 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Make;
+namespace KanekiYuto\Handy\Cascade1\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
+use KanekiYuto\Handy\Cascade1\Builder;
+use KanekiYuto\Handy\Cascade1\Constants\CascadeConst;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
 

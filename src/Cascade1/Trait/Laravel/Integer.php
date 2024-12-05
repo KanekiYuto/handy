@@ -1,10 +1,10 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Trait\Laravel;
+namespace KanekiYuto\Handy\Cascade1\Trait\Laravel;
 
-use KanekiYuto\Handy\Cascade\ColumnDefinition;
-use KanekiYuto\Handy\Cascade\ColumnParams;
-use KanekiYuto\Handy\Cascade\Constants\ColumnTypeConstant;
+use KanekiYuto\Handy\Cascade1\ColumnDefinition;
+use KanekiYuto\Handy\Cascade1\ColumnParams;
+use KanekiYuto\Handy\Cascade1\Constants\ColumnTypeConstant;
 
 trait Integer
 {

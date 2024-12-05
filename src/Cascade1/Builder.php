@@ -1,11 +1,11 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade;
+namespace KanekiYuto\Handy\Cascade1;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
+use KanekiYuto\Handy\Cascade1\Constants\CascadeConst;
 
 /**
  * 构建 - [Builder]

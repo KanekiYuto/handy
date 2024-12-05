@@ -1,14 +1,14 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Make;
+namespace KanekiYuto\Handy\Cascade1\Make;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\Support\Stringable;
-use KanekiYuto\Handy\Cascade\Blueprint;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use KanekiYuto\Handy\Cascade\Contracts\Make as MakeInterface;
+use KanekiYuto\Handy\Cascade1\Blueprint;
+use KanekiYuto\Handy\Cascade1\Builder;
+use KanekiYuto\Handy\Cascade1\Constants\CascadeConst;
+use KanekiYuto\Handy\Cascade1\Contracts\Make as MakeInterface;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\warning;

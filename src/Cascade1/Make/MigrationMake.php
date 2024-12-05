@@ -1,11 +1,11 @@
 <?php
 
-namespace KanekiYuto\Handy\Cascade\Make;
+namespace KanekiYuto\Handy\Cascade1\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use KanekiYuto\Handy\Cascade\MigrationParams;
+use KanekiYuto\Handy\Cascade1\Builder;
+use KanekiYuto\Handy\Cascade1\Constants\CascadeConst;
+use KanekiYuto\Handy\Cascade1\MigrationParams;
 use stdClass;
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\note;

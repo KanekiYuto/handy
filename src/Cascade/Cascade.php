@@ -3,9 +3,10 @@
 namespace KanekiYuto\Handy\Cascade;
 
 use Closure;
-use KanekiYuto\Handy\Cascade\Make\ModelMake;
-use KanekiYuto\Handy\Cascade\Make\MigrationMake;
-use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
+use KanekiYuto\Handy\Cascade\Params\Model as ModelParams;
+use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
+use KanekiYuto\Handy\Cascade\Params\DatabaseTable as DatabaseTableParams;
+
 
 /**
  * Cascade
@@ -15,28 +16,11 @@ use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 class Cascade
 {
 
-	/**
-	 * 表名称
-	 *
-	 * @var string
-	 */
-	private string $withTableName;
-
-	/**
-	 * 表注释
-	 *
-	 * @var string
-	 */
-	private string $withTableComment;
-
-	/**
-	 * Blueprint
-	 *
-	 * @var Blueprint
-	 */
-	private Blueprint $blueprint;
+	private DatabaseTableParams $tableParams;
 
 	private ModelParams $modelParams;
+
+	private BlueprintParams $blueprintParams;
 
 	/**
 	 * 创建一个 [Cascade] 实例
@@ -49,50 +33,16 @@ class Cascade
 	}
 
 	/**
-	 * 配置信息
-	 *
-	 * @return static
-	 */
-	public static function configure(): static
-	{
-		return new self();
-	}
-
-	/**
-	 * 设置 [Table]
+	 * 设置 - 【Table】
 	 *
 	 * @param  string  $table
 	 * @param  string  $comment
 	 *
 	 * @return Cascade
 	 */
-	public function withTable(
-		string $table,
-		string $comment = ''
-	): static {
-		$this->withTableName = $table;
-		$this->withTableComment = $comment;
-
-		return $this;
-	}
-
-	/**
-	 * 设置 [Blueprint]
-	 *
-	 * @param  Closure  $callback
-	 *
-	 * @return Cascade
-	 */
-	public function withBlueprint(Closure $callback): static
+	public function withTable(string $table, string $comment = ''): static
 	{
-		$blueprint = new Blueprint(
-			$this->withTableName,
-			$this->withTableComment
-		);
-
-		$callback($blueprint);
-
-		$this->blueprint = $blueprint;
+		$this->tableParams = new DatabaseTableParams($table, $comment);
 
 		return $this;
 	}
@@ -106,38 +56,44 @@ class Cascade
 	 *
 	 * @return Cascade
 	 */
-	public function withModel(
-		string $extends,
-		bool $incrementing = false,
-		bool $timestamps = false
-	): static {
-		$this->modelParams = (new ModelParams())
-			->setExtends($extends)
-			->setIncrementing($incrementing)
-			->setTimestamps($timestamps);
+	public function withModel(string $extends, bool $incrementing = false, bool $timestamps = false): static
+	{
+		$this->modelParams = new ModelParams(
+			$extends,
+			$incrementing,
+			$timestamps
+		);
 
 		return $this;
 	}
 
 	/**
-	 * 启动创建
+	 * 设置 - [Blueprint]
 	 *
-	 * @return void
+	 * @param  Closure  $callable
+	 *
+	 * @return Cascade
 	 */
+	public function withBlueprint(Closure $callable): static
+	{
+		if (!isset($this->tableParams)) {
+			return $this;
+		}
+
+		$this->blueprintParams = new BlueprintParams(
+			$this->tableParams->getTable(),
+			$this->tableParams->getComment(),
+			$callable,
+		);
+
+		return $this;
+	}
+
 	public function create(): void
 	{
-		if (!isset($this->blueprint)) {
-			return;
-		}
+		$blueprintCallable = $this->blueprintParams->getCallable();
 
-		$blueprint = $this->blueprint;
-
-		(new EloquentTraceMake($blueprint))->boot();
-		(new MigrationMake($blueprint))->boot();
-
-		if (isset($this->modelParams)) {
-			(new ModelMake($blueprint, $this->modelParams))->boot();
-		}
+		$blueprintCallable(new Blueprint($this->blueprintParams));
 	}
 
 }
