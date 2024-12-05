@@ -2,6 +2,8 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
+
 class ModelMake extends Make
 {
 
@@ -102,6 +104,14 @@ class ModelMake extends Make
         })->all();
 
         return implode("\n", $packages);
+    }
+
+    protected function cascadeDisk(array $values): Filesystem
+    {
+        return parent::cascadeDisk([
+            $this->configureParams->getModel()->getFilepath(),
+            ...$values,
+        ]);
     }
 
 }
