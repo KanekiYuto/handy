@@ -5,7 +5,12 @@ namespace KanekiYuto\Handy\Cascade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem;
 
-class Disk
+/**
+ * 磁盘管理
+ *
+ * @author KanekiYuto
+ */
+class DiskManager
 {
 
     /**

@@ -3,7 +3,7 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Disk;
+use KanekiYuto\Handy\Cascade\DiskManager;
 
 /**
  * 存根模板
@@ -54,7 +54,7 @@ trait Template
             default => $value
         };
 
-        $stubsDisk = Disk::stubDisk();
+        $stubsDisk = DiskManager::stubDisk();
         $stub = $stubsDisk->get('template.const.stub');
 
         return $this->param(
@@ -75,7 +75,7 @@ trait Template
      */
     protected final function templatePropertyComment(string $comment, string $var): string
     {
-        $stubsDisk = Disk::stubDisk();
+        $stubsDisk = DiskManager::stubDisk();
         $stub = $stubsDisk->get('template.comment.property.stub');
 
         return $this->param(

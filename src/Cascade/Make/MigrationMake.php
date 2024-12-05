@@ -4,12 +4,16 @@ namespace KanekiYuto\Handy\Cascade\Make;
 
 use stdClass;
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Disk;
+use KanekiYuto\Handy\Cascade\DiskManager;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
-use function Laravel\Prompts\note;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\error;
 
+/**
+ * 迁移构建
+ *
+ * @author KanekiYuto
+ */
 class MigrationMake extends Make
 {
 
@@ -20,36 +24,33 @@ class MigrationMake extends Make
      */
     public function boot(): void
     {
-        note('开始创建 Migration...');
+        $this->run('Migration', 'migration.stub', function () {
+            $table = $this->tableParams->getTable();
 
-        $stubsDisk = Disk::stubDisk();
-        $this->load($stubsDisk->get('migration.stub'));
+            $this->param('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->param('comment', $this->migrationParams->getComment());
+            $this->param('blueprint', $this->makeColumns());
 
-        if (empty($this->stub)) {
-            error('创建失败...存根无效或不存在...');
-            return;
-        }
+            $folderDisk = DiskManager::migrationDisk();
+            $fileName = $this->filename("cascade_create_{$table}_table");
 
-        $table = $this->tableParams->getTable();
+            if (!$folderDisk->put($fileName, $this->stub)) {
+                error('创建失败...写入文件失败！');
+                return;
+            }
 
-        $this->param('traceEloquent', $this->getDefaultNamespace([
-            'Trace', 'Eloquent',
-        ], [
-            $this->getDefaultClassName('Trace'),
-        ]));
+            info('创建...完成！');
+        });
+    }
 
-        $this->param('comment', $this->migrationParams->getComment());
-        $this->param('blueprint', $this->makeColumns());
+    public function getTraceEloquentNamespace(): string
+    {
+        $make = $this->getTraceEloquent();
 
-        $folderDisk = Disk::migrationDisk();
-        $fileName = $this->filename("cascade_create_{$table}_table");
-
-        if (!$folderDisk->put($fileName, $this->stub)) {
-            error('创建失败...写入文件失败！');
-            return;
-        }
-
-        info('创建...完成！');
+        return $make->getConfigureNamespace([
+            $make->getNamespace(),
+            $make->getClassName(),
+        ]);
     }
 
     /**

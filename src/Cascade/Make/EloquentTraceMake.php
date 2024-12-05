@@ -3,11 +3,8 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Disk;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
-use function Laravel\Prompts\note;
-use function Laravel\Prompts\error;
 
 class EloquentTraceMake extends Make
 {
@@ -33,39 +30,29 @@ class EloquentTraceMake extends Make
      */
     public function boot(): void
     {
-        note('开始创建 Eloquent Trace...');
+        $this->run('Eloquent Trace', 'eloquent-trace.stub', function () {
+            $table = $this->blueprintParams->getTable();
+            $className = $this->getClassName();
 
-        $stubsDisk = Disk::stubDisk();
-        $this->load($stubsDisk->get('eloquent-trace.stub'));
+            $this->param('class', $className);
+            $this->param('table', $table);
 
-        if (empty($this->stub)) {
-            error('创建失败...存根无效或不存在...');
-            return;
-        }
+            $this->param('namespace', $this->getConfigureNamespace([
+                $this->getNamespace(),
+            ]));
 
-        $table = $this->blueprintParams->getTable();
-        $className = $this->getDefaultClassName('Trace');
+            $this->param('primaryKey', 'self::ID');
+            $this->param('columns', $this->makeColumns());
+            $this->param('hidden', $this->makeHidden());
+            $this->param('fillable', $this->makeFillable());
 
-        $this->param('class', $className);
-        $this->param('table', $table);
-
-        $this->param('namespace', $this->getConfigureNamespace([
-            $this->getNamespace(),
-        ]));
-
-        $this->param('primaryKey', 'self::ID');
-        $this->param('columns', $this->makeColumns());
-        $this->param('hidden', $this->makeHidden());
-        $this->param('fillable', $this->makeFillable());
-
-        echo $this->stub;
-
-        $this->cascadeDisk([
-            $this->getNamespace(),
-        ])->put($this->filename($className), $this->stub);
+            $this->cascadeDisk([
+                $this->getNamespace(),
+            ])->put($this->filename($className), $this->stub);
+        });
     }
 
-    protected function getConfigureNamespace(array $values): string
+    public function getConfigureNamespace(array $values): string
     {
         return parent::getConfigureNamespace([
             $this->configureParams->getEloquentTrace()->getNamespace(),
@@ -141,6 +128,11 @@ class EloquentTraceMake extends Make
             $this->configureParams->getEloquentTrace()->getFilepath(),
             ...$values,
         ]);
+    }
+
+    public function getClassName(): string
+    {
+        return $this->getDefaultClassName('Trace');
     }
 
 }

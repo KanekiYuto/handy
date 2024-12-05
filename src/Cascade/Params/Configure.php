@@ -2,6 +2,7 @@
 
 namespace KanekiYuto\Handy\Cascade\Params;
 
+use KanekiYuto\Handy\Cascade\Params\Configure\Model;
 use KanekiYuto\Handy\Cascade\Params\Configure\EloquentTrace;
 
 class Configure
@@ -17,6 +18,8 @@ class Configure
 
     private EloquentTrace $eloquentTrace;
 
+    private Model $model;
+
     public function __construct()
     {
         $this->appNamespace = 'App';
@@ -24,6 +27,7 @@ class Configure
         $this->cascadeNamespace = 'Cascade';
         $this->cascadeFilepath = $this->cascadeNamespace;
         $this->eloquentTrace = new EloquentTrace();
+        $this->model = new Model();
     }
 
     public function getAppNamespace(): string
@@ -49,6 +53,11 @@ class Configure
     public function getEloquentTrace(): EloquentTrace
     {
         return $this->eloquentTrace;
+    }
+
+    public function getModel(): Model
+    {
+        return $this->model;
     }
 
 }

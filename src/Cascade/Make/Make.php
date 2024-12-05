@@ -2,14 +2,17 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+use Closure;
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Disk;
+use KanekiYuto\Handy\Cascade\DiskManager;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
+use function Laravel\Prompts\note;
+use function Laravel\Prompts\error;
 
 class Make
 {
@@ -143,7 +146,22 @@ class Make
         }
     }
 
-    protected function getConfigureNamespace(array $values): string
+    protected function run(string $name, string $stub, Closure $callable): void
+    {
+        note("开始构建 $name...");
+
+        $stubsDisk = DiskManager::stubDisk();
+        $this->load($stubsDisk->get($stub));
+
+        if (empty($this->stub)) {
+            error('创建失败...存根无效或不存在...');
+            return;
+        }
+
+        $callable();
+    }
+
+    public function getConfigureNamespace(array $values): string
     {
         return implode('\\', [
             $this->configureParams->getAppNamespace(),
@@ -152,7 +170,7 @@ class Make
         ]);
     }
 
-    protected final function getNamespace(): string
+    public final function getNamespace(): string
     {
         $table = $this->tableParams->getTable();
 
@@ -168,7 +186,7 @@ class Make
 
     protected function cascadeDisk(array $values): Filesystem
     {
-        return Disk::useDisk(implode(DIRECTORY_SEPARATOR, [
+        return DiskManager::useDisk(implode(DIRECTORY_SEPARATOR, [
             $this->configureParams->getAppFilepath(),
             $this->configureParams->getCascadeFilepath(),
             ...$values,
@@ -214,6 +232,17 @@ class Make
     protected final function filename(string $filename, string $suffix = 'php'): string
     {
         return "$filename.$suffix";
+    }
+
+    protected function getTraceEloquent(): EloquentTraceMake
+    {
+        return new EloquentTraceMake(
+            $this->configureParams,
+            $this->blueprintParams,
+            $this->tableParams,
+            $this->modelParams,
+            $this->migrationParams
+        );
     }
 
 }
