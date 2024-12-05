@@ -3,7 +3,7 @@
 namespace KanekiYuto\Handy\Cascade\Console;
 
 use Illuminate\Filesystem\Filesystem;
-use KanekiYuto\Handy\Cascade1\Cascade;
+use KanekiYuto\Handy\Cascade\Cascade;
 use Symfony\Component\Console\Attribute\AsCommand;
 use KanekiYuto\Handy\Console\Trait\ConfirmableTrait;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
