@@ -44,6 +44,26 @@ class Make
     }
 
     /**
+     * 获取一个默认的类名称 (根据表名称生成)
+     *
+     * @param  string  $suffix
+     *
+     * @return string
+     */
+    public function getDefaultClassName(string $suffix = ''): string
+    {
+        $table = $this->tableParams->getTable();
+
+        $className = explode('_', $table);
+
+        // 取最后一个名称作为最终的类名
+        $className = collect($className)->last();
+        $className = Str::headline($className);
+
+        return $className . $suffix;
+    }
+
+    /**
      * load param to the stub
      *
      * @param  string       $param
@@ -115,5 +135,23 @@ class Make
         }
     }
 
+    protected final function getDefaultNamespace(array $namespace): string
+    {
+        $table = $this->tableParams->getTable();
+        $namespace = implode('\\', [
+            'Cascade',
+            ...$namespace,
+        ]);
+
+        $table = explode('_', $table);
+        $table = collect($table)
+            ->except([count($table) - 1])
+            ->all();
+
+        $table = implode('\\', $table);
+        $table = Str::headline($table);
+
+        return $namespace . '\\' . $table;
+    }
 
 }

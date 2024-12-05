@@ -2,6 +2,9 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+use Illuminate\Support\Str;
+use KanekiYuto\Handy\Cascade\Disk;
+
 /**
  * 存根模板
  *
@@ -33,6 +36,89 @@ trait Template
         }
 
         return implode("\n", $tabString);
+    }
+
+    /**
+     * 常量声明模板
+     *
+     * @param  string        $const
+     * @param  string|array  $value
+     *
+     * @return string
+     */
+    protected final function templateConst(string $const, string|array $value): string
+    {
+        $value = match (gettype($value)) {
+            'array' => '[' . implode(', ', $value) . ']',
+            'string' => "'$value'",
+            default => $value
+        };
+
+        $stubsDisk = Disk::stubDisk();
+        $stub = $stubsDisk->get('template.const.stub');
+
+        return $this->param(
+            'value',
+            $value,
+            false,
+            $this->param('const', $const, false, $stub)
+        );
+    }
+
+    /**
+     * 属性注释模板
+     *
+     * @param  string  $comment
+     * @param  string  $var
+     *
+     * @return string
+     */
+    protected final function templatePropertyComment(string $comment, string $var): string
+    {
+        $stubsDisk = Disk::stubDisk();
+        $stub = $stubsDisk->get('template.comment.property.stub');
+
+        return $this->param(
+            '@var',
+            "@var " . $var,
+            false,
+            $this->param('comment', $comment, false, $stub)
+        );
+    }
+
+    protected final function formattingStub(string $stub): string
+    {
+        $stubArray = explode("\n", $stub);
+        $recordRow = [];
+        $returnStub = [];
+
+        foreach ($stubArray as $index => $str) {
+            if ($index === 0 || $index === count($stubArray) - 1) {
+                $returnStub[] = $str;
+                continue;
+            }
+
+            if (in_array($index, $recordRow)) {
+                continue;
+            }
+
+            $lastRow = $stubArray[$index - 1];
+            $nextRow = $stubArray[$index + 1];
+
+            $nullRow = Str::of($str)
+                ->replace(' ', '')
+                ->toString();
+
+            if (empty($lastRow) && empty($nextRow) && empty($nullRow)) {
+                $recordRow[] = $index + 1;
+                continue;
+            }
+
+            $returnStub[] = $str;
+            $recordRow = [];
+        }
+
+        return implode("\n", $returnStub);
     }
 
 }

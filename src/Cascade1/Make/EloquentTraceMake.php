@@ -52,6 +52,7 @@ class EloquentTraceMake extends Make
 
 		$blueprint = $this->blueprint;
 		$table = $blueprint->getTable();
+
 		$className = $this->getClassName($table, CascadeConst::TRACE_FILE_SUFFIX);
 		$namespace = $this->getNamespace($table, [
 			CascadeConst::CASCADE_NAMESPACE,

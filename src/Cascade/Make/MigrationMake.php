@@ -29,7 +29,10 @@ class MigrationMake extends Make
             return;
         }
 
-        $this->param('traceEloquent', '');
+        $this->param('traceEloquent', $this->getDefaultNamespace([
+            'Trace', 'Eloquent',
+        ]));
+
         $this->param('comment', $this->migrationParams->getComment());
         $this->param('blueprint', $this->makeColumns());
 
