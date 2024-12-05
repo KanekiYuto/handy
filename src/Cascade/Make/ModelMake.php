@@ -31,7 +31,9 @@ class ModelMake extends Make
 
             $this->stub = $this->formattingStub($this->stub);
 
-            echo $this->stub;
+            $this->cascadeDisk([
+                $this->getNamespace(),
+            ])->put($this->filename($className), $this->stub);
         });
     }
 
