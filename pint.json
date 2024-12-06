@@ -1,6 +1,0 @@
-{
-    "preset": "laravel",
-    "rules": {
-        "simplified_null_return": false
-    }
-}

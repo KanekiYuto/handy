@@ -20,10 +20,11 @@ class AutoTimezone
     /**
      * The extracted data is converted
      *
-     * @param  Model  $model
+     * @param  Model   $model
      * @param  string  $key
-     * @param  mixed  $value
-     * @param  array  $attributes
+     * @param  mixed   $value
+     * @param  array   $attributes
+     *
      * @return string
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): string
@@ -44,10 +45,11 @@ class AutoTimezone
     /**
      * Convert to a value that will be stored
      *
-     * @param  Model  $model
+     * @param  Model   $model
      * @param  string  $key
-     * @param  array  $value
-     * @param  array  $attributes
+     * @param  array   $value
+     * @param  array   $attributes
+     *
      * @return int
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): int

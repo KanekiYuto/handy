@@ -31,7 +31,7 @@ class MigrationMake extends Make
                 'traceEloquent',
                 $this->getTraceEloquentMake()->getNamespaceClass()
             );
-            
+
             $this->stubParam('comment', $this->migrationParams->getComment());
             $this->stubParam('blueprint', $this->makeColumns());
 
@@ -80,7 +80,10 @@ class MigrationMake extends Make
             $params = $param->getParams();
 
             $template .= "->$fn(";
-            $template .= implode(', ', $this->makeParameters($params));
+            $template .= implode(
+                ', ',
+                $this->makeParameters($fn, $params)
+            );
 
             $template .= ')';
         }
@@ -93,11 +96,12 @@ class MigrationMake extends Make
     /**
      * 构建函数参数信息
      *
+     * @param  string    $fn
      * @param  stdClass  $values
      *
      * @return array
      */
-    public function makeParameters(stdClass $values): array
+    public function makeParameters(string $fn, stdClass $values): array
     {
         $parameters = [];
 
@@ -107,25 +111,20 @@ class MigrationMake extends Make
                 continue;
             }
 
+            // 判定是否引用 [Trace]
+            $isQuote = Str::startsWith($key, '@quote');
+            $key = $isQuote ? Str::of($key)->chopStart('@quote')->toString() : $key;
+
             // 命名参数设置，避免顺序问题
             $parameter = "$key: ";
 
-            // 类型处理
-            $val = match (gettype($val)) {
+            // 类型处理 | 如果是引用 [Trace] 会进行特殊处理
+            $val = $isQuote ? match (gettype($val)) {
                 'string' => "'$val'",
                 'boolean' => $this->boolConvertString($val),
                 'array' => $this->makeArrayParams($val),
                 default => $val
-            };
-
-            // @todo 临时补丁， 后续需要解决
-            if ($key === 'column') {
-                $field = Str::of($val)
-                    ->replace("'", '')
-                    ->upper();
-
-                $val = "TheTrace::$field";
-            }
+            } : "TheTrace::$val";
 
             $parameters[] = $parameter . $val;
         }
