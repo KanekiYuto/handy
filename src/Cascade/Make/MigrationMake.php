@@ -2,16 +2,15 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
-use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use KanekiYuto\Handy\Cascade\MigrationParams;
 use stdClass;
+use Illuminate\Support\Str;
+use KanekiYuto\Handy\Cascade\DiskManager;
+use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
+use function Laravel\Prompts\info;
 use function Laravel\Prompts\error;
-use function Laravel\Prompts\note;
 
 /**
- * 构建 - [Migration]
+ * 迁移构建
  *
  * @author KanekiYuto
  */
@@ -25,89 +24,80 @@ class MigrationMake extends Make
      */
     public function boot(): void
     {
-        parent::boot();
+        $this->run('Migration', 'migration.stub', function () {
+            $table = $this->tableParams->getTable();
 
-        note('开始创建 Migration...');
+            $this->stubParam(
+                'traceEloquent',
+                $this->getTraceEloquentMake()->getNamespaceClass()
+            );
+            
+            $this->stubParam('comment', $this->migrationParams->getComment());
+            $this->stubParam('blueprint', $this->makeColumns());
 
-        $stubsDisk = Builder::useDisk(Builder::getStubsPath());
-        $this->load($stubsDisk->get('migration.stub'));
+            $folderDisk = DiskManager::migrationDisk();
+            $fileName = $this->filename("cascade_create_{$table}_table");
 
-        if (empty($this->stub)) {
-            error('创建失败...存根无效或不存在...');
-            return;
-        }
+            if (!$folderDisk->put($fileName, $this->stub)) {
+                error('创建失败...写入文件失败！');
+                return;
+            }
 
-        $blueprint = $this->blueprint;
-        $table = $blueprint->getTable();
-
-        // Do it...
-        $this->param('traceEloquent', $this->getPackage($table, [
-			CascadeConst::CASCADE_NAMESPACE,
-            CascadeConst::TRACE_NAMESPACE,
-            CascadeConst::TRACE_ELOQUENT_NAMESPACE
-        ], CascadeConst::TRACE_NAMESPACE));
-
-        $this->param('comment', $blueprint->getComment());
-        $this->param('blueprint', $this->columns());
-
-        $folderPath = Builder::getMigrationPath();
-        $folderDisk = Builder::useDisk($folderPath);
-        $fileName = $this->filename("cascade_create_{$table}_table.");
-
-        $this->isPut($fileName, $folderPath, $folderDisk);
+            info('创建...完成！');
+        });
     }
 
     /**
-     * 处理列数据
+     * 构建所有列信息
      *
      * @return string
      */
-    private function columns(): string
+    public function makeColumns(): string
     {
-        $columns = $this->blueprint->getColumns();
+        $columns = $this->blueprintParams->getColumns();
         $templates = [];
 
         foreach ($columns as $column) {
-            $columnParams = $column->getColumnParams();
-            $migrationParams = $columnParams->getMigrationParams();
-
-            $template = '@table';
-
-            collect($migrationParams)->map(function (MigrationParams $migrationParam) use (&$template) {
-                // 不使用的参数不输出
-                if (!$migrationParam->isUse()) {
-                    return $migrationParam;
-                }
-
-                $fn = $migrationParam->getFn();
-                $params = $migrationParam->getParams();
-
-                $paramsTemplate = "->$fn(";
-                $paramsTemplate .= implode(', ', $this->parameters($params));
-
-                $paramsTemplate .= ')';
-                $template .= $paramsTemplate;
-
-                return $migrationParam;
-            });
-
-            $template .= ';';
-            $template = Str::of($template)->replace('@', '$');
-
-            $templates[] = $template;
+            $templates[] = $this->makeColumn($column);
         }
 
         return $this->tab(implode("\n", $templates), 3);
     }
 
     /**
-     * 处理列参数
+     * 构建一个完整的列定义调用
      *
-     * @param stdClass $values
+     * @param  ColumnParams  $column
+     *
+     * @return string
+     */
+    public function makeColumn(ColumnParams $column): string
+    {
+        $template = '@table';
+
+        foreach ($column->getMigrationParams() as $param) {
+            $fn = $param->getFn();
+            $params = $param->getParams();
+
+            $template .= "->$fn(";
+            $template .= implode(', ', $this->makeParameters($params));
+
+            $template .= ')';
+        }
+
+        return Str::of($template . ';')
+            ->replace('@', '$')
+            ->toString();
+    }
+
+    /**
+     * 构建函数参数信息
+     *
+     * @param  stdClass  $values
      *
      * @return array
      */
-    private function parameters(stdClass $values): array
+    public function makeParameters(stdClass $values): array
     {
         $parameters = [];
 
@@ -117,27 +107,27 @@ class MigrationMake extends Make
                 continue;
             }
 
+            // 命名参数设置，避免顺序问题
             $parameter = "$key: ";
 
             // 类型处理
             $val = match (gettype($val)) {
                 'string' => "'$val'",
                 'boolean' => $this->boolConvertString($val),
-                'array' => $this->arrayParams($val),
+                'array' => $this->makeArrayParams($val),
                 default => $val
             };
 
-            // 指定的参数与列引用变量
-            // @todo 可能存在隐患
+            // @todo 临时补丁， 后续需要解决
             if ($key === 'column') {
                 $field = Str::of($val)
                     ->replace("'", '')
                     ->upper();
+
                 $val = "TheTrace::$field";
             }
 
-            $parameter .= $val;
-            $parameters[] = $parameter;
+            $parameters[] = $parameter . $val;
         }
 
         return $parameters;
@@ -146,11 +136,11 @@ class MigrationMake extends Make
     /**
      * 数组转换为参数字符串
      *
-     * @param array $values
+     * @param  array  $values
      *
      * @return string
      */
-    private function arrayParams(array $values): string
+    private function makeArrayParams(array $values): string
     {
         $val = json_encode($values, JSON_UNESCAPED_UNICODE);
 

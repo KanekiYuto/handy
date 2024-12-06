@@ -2,346 +2,63 @@
 
 namespace KanekiYuto\Handy\Cascade\Trait\Laravel;
 
-use KanekiYuto\Handy\Cascade\ColumnDefinition;
-use KanekiYuto\Handy\Cascade\ColumnParams;
-use ReflectionException;
-use ReflectionMethod;
 use stdClass;
-use function Laravel\Prompts\error;
+use KanekiYuto\Handy\Cascade\ColumnDefinition;
+use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
+use KanekiYuto\Handy\Cascade\Blueprint as CascadeBlueprint;
+use KanekiYuto\Handy\Cascade\Params\Migration as MigrationParams;
 
 trait Blueprint
 {
 
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int|null $length
-     *
-     * @return ColumnDefinition
-     */
-    public function string(string $column, int $length = null): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$length' => $length
-        ]);
+	use Helper;
 
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
+	/**
+	 * 自动化的参数处理
+	 *
+	 * @param  string            $fn
+	 * @param  string            $column
+	 * @param  array             $params
+	 * @param  CascadeBlueprint  $blueprint
+	 *
+	 * @return ColumnDefinition
+	 */
+	protected function autoParams(
+		string $fn,
+		string $column,
+		array $params,
+		CascadeBlueprint $blueprint
+	): ColumnDefinition {
+		return $this->pushParams(
+			$fn,
+			$column,
+			$this->useParams(__CLASS__, $fn, $params),
+			$blueprint
+		);
+	}
 
-        return $this->addColumn($columnDefinition);
-    }
+	/**
+	 * 把参数加入到对象树中
+	 *
+	 * @param  string            $fn
+	 * @param  string            $column
+	 * @param  stdClass          $params
+	 * @param  CascadeBlueprint  $blueprint
+	 *
+	 * @return ColumnDefinition
+	 */
+	protected function pushParams(
+		string $fn,
+		string $column,
+		stdClass $params,
+		CascadeBlueprint $blueprint
+	): ColumnDefinition {
+		$columnParams = (new ColumnParams($column))
+			->addMigrationParams(new MigrationParams($fn, $params));
 
-    /**
-     * 自动判断是否需要使用方法参数 [如果值不是默认的话]
-     *
-     * @param string $fn
-     * @param array $params
-     *
-     * @return stdClass
-     */
-    protected function useParams(string $fn, array $params): stdClass
-    {
-        $validParams = [];
+		$blueprint->blueprintParams->addColumn($columnParams);
 
-        try {
-            $method = new ReflectionMethod(__CLASS__, $fn);
-
-            foreach ($method->getParameters() as $param) {
-                $paramName = $param->getName();
-                $value = $params['$' . $paramName];
-
-                if ($param->isOptional() && $value === $param->getDefaultValue()) {
-                    continue;
-                }
-
-                $validParams[$paramName] = $value;
-            }
-        } catch (ReflectionException $e) {
-            error($e->getMessage());
-        }
-
-        return (object)$validParams;
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int|null $length
-     * @param bool $fixed
-     *
-     * @return ColumnDefinition
-     */
-    public function binary(
-        string $column,
-        int    $length = null,
-        bool   $fixed = false
-    ): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$length' => $length,
-            '$fixed' => $fixed
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $precision
-     *
-     * @return ColumnDefinition
-     */
-    public function dateTimeTz(string $column, int $precision = 0): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$precision' => $precision,
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $precision
-     *
-     * @return ColumnDefinition
-     */
-    public function dateTime(string $column, int $precision = 0): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$precision' => $precision,
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $total
-     * @param int $places
-     *
-     * @return ColumnDefinition
-     */
-    public function decimal(
-        string $column,
-        int    $total = 8,
-        int    $places = 2
-    ): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$total' => $total,
-            '$places' => $places
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param array $allowed
-     *
-     * @return ColumnDefinition
-     */
-    public function enum(string $column, array $allowed): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$allowed' => $allowed
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $precision
-     *
-     * @return ColumnDefinition
-     */
-    public function float(string $column, int $precision = 53): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$precision' => $precision
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $length
-     *
-     * @return ColumnDefinition
-     */
-    public function foreignUlid(string $column, int $length = 26): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$length' => $length
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param string|null $subtype
-     * @param int $srid
-     *
-     * @return ColumnDefinition
-     */
-    public function geography(
-        string $column,
-        string $subtype = null,
-        int    $srid = 4326
-    ): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$subtype' => $subtype,
-            '$srid' => $srid
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param string|null $subtype
-     * @param int $srid
-     *
-     * @return ColumnDefinition
-     */
-    public function geometry(
-        string $column,
-        string $subtype = null,
-        int    $srid = 0): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$subtype' => $subtype,
-            '$srid' => $srid
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param array $allowed
-     *
-     * @return ColumnDefinition
-     */
-    public function set(string $column, array $allowed): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$allowed' => $allowed
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
-
-    /**
-     * 与 Laravel Blueprint 保持一致
-     *
-     * @param string $column
-     * @param int $length
-     *
-     * @return ColumnDefinition
-     */
-    public function ulid(string $column = 'ulid', int $length = 26): ColumnDefinition
-    {
-        $params = $this->useParams(__FUNCTION__, [
-            '$column' => $column,
-            '$length' => $length
-        ]);
-
-        $columnDefinition = new ColumnDefinition(
-            (new ColumnParams($column))
-                ->setMigrationParam(__FUNCTION__, $params)
-        );
-
-        return $this->addColumn($columnDefinition);
-    }
+		return new ColumnDefinition($columnParams);
+	}
 
 }
-

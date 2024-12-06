@@ -3,122 +3,173 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use function Laravel\Prompts\note;
-use function Laravel\Prompts\error;
+use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 
 /**
- * 构建 - [EloquentTrace]
+ * EloquentTrace
  *
  * @author KanekiYuto
  */
-class EloquentTraceMake extends Make
+class EloquentTraceMake extends CascadeMake
 {
 
-	/**
-	 * property
-	 *
-	 * @var array
-	 */
-	private array $hidden = [];
+    /**
+     * property
+     *
+     * @var array
+     */
+    private array $hidden = [];
 
-	/**
-	 * property
-	 *
-	 * @var array
-	 */
-	private array $fillable = [];
+    /**
+     * property
+     *
+     * @var array
+     */
+    private array $fillable = [];
 
+    /**
+     * 引导构建
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
+        $this->run('Eloquent Trace', 'eloquent-trace.stub', function () {
+            $table = $this->blueprintParams->getTable();
+            $className = $this->getDefaultClassName();
 
-	/**
-	 * 引导构建
-	 *
-	 * @return void
-	 */
-	public function boot(): void
-	{
-		parent::boot();
+            $this->stubParam('namespace', $this->getNamespace());
+            $this->stubParam('class', $className);
+            $this->stubParam('table', $table);
 
-		note('开始创建 Eloquent Trace...');
+            $this->stubParam('primaryKey', 'self::ID');
+            $this->stubParam('columns', $this->makeColumns());
+            $this->stubParam('hidden', $this->makeConstantValues($this->hidden));
+            $this->stubParam('fillable', $this->makeConstantValues($this->fillable));
 
-		$stubsDisk = Builder::useDisk(Builder::getStubsPath());
-		$this->load($stubsDisk->get('eloquent-trace.stub'));
+            $folderPath = $this->cascadeDiskPath([
+                $this->tableParams->getNamespace(),
+            ]);
 
-		if (empty($this->stub)) {
-			error('创建失败...存根无效或不存在...');
-			return;
-		}
+            $this->isPut($this->filename($className), $folderPath);
+        });
+    }
 
-		$blueprint = $this->blueprint;
-		$table = $blueprint->getTable();
-		$className = $this->getClassName($table, CascadeConst::TRACE_FILE_SUFFIX);
-		$namespace = $this->getNamespace($table, [
-			CascadeConst::CASCADE_NAMESPACE,
-			CascadeConst::TRACE_NAMESPACE,
-			CascadeConst::TRACE_ELOQUENT_NAMESPACE,
-		]);
+    /**
+     * 获取默认的类名称
+     *
+     * @param  string  $suffix
+     *
+     * @return string
+     */
+    public function getDefaultClassName(string $suffix = ''): string
+    {
+        return parent::getDefaultClassName(empty($suffix) ? 'Trace' : $suffix);
+    }
 
-		// Do it...
-		$this->param('namespace', implode(CascadeConst::NAMESPACE_SEPARATOR, [
-			CascadeConst::APP_NAMESPACE,
-			$namespace,
-		]));
+    /**
+     * 获取设置的命名空间
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    public function getConfigureNamespace(array $values): string
+    {
+        return parent::getConfigureNamespace([
+            $this->configureParams->getEloquentTrace()->getNamespace(),
+            ...$values,
+        ]);
+    }
 
-		$this->param('table', $blueprint->getTable());
-		$this->param('class', $className);
+    public function getNamespace(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+        ]);
+    }
 
-		// @todo 智能可选
-		$this->param('primaryKey', 'self::ID');
-		$this->param('columns', $this->columns());
+    public function getNamespaceClass(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+            $this->getDefaultClassName()
+        ]);
+    }
 
-		$hidden = collect($this->hidden)->map(function (string $value) {
-			return "self::$value";
-		})->all();
+    /**
+     * 构建所有列信息
+     *
+     * @return string
+     */
+    private function makeColumns(): string
+    {
+        $columns = $this->blueprintParams->getColumns();
+        $templates = [];
 
-		$this->param('hidden', implode(', ', $hidden));
+        foreach ($columns as $column) {
+            $templates[] = $this->makeColumn($column);
+        }
 
-		$fillable = collect($this->fillable)->map(function (string $value) {
-			return "self::$value";
-		})->all();
+        return $this->tab(implode("\n", $templates), 1);
+    }
 
-		$this->param('fillable', implode(', ', $fillable));
+    /**
+     * 构建列参数
+     *
+     * @param  ColumnParams  $column
+     *
+     * @return string
+     */
+    private function makeColumn(ColumnParams $column): string
+    {
+        $template = [];
 
-		$this->putFile($namespace, $className);
-	}
+        $field = $column->getField();
+        $constantName = Str::of($field)->upper()->toString();
 
-	/**
-	 * 处理列数据
-	 *
-	 * @return string
-	 */
-	private function columns(): string
-	{
-		$columns = $this->blueprint->getColumns();
-		$templates = [];
+        $template[] = $this->templatePropertyComment($column->getComment(), 'string');
+        $template[] = $this->templateConst($constantName, $field);
+        $template = implode('', $template);
 
-		foreach ($columns as $column) {
-			$columnDefinition = $column->getColumnParams();
-			$template = [];
+        if ($column->isHide()) {
+            $this->hidden[] = $constantName;
+        } else {
+            $this->fillable[] = $constantName;
+        }
 
-			$field = $columnDefinition->getField();
-			$constantCode = Str::of($field)->upper();
+        return $template;
+    }
 
-			$template[] = $this->templatePropertyComment($columnDefinition->getComment(), 'string');
-			$template[] = $this->templateConst($constantCode, $field);
-			$template = implode("", $template);
+    /**
+     * 构建常量值
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    private function makeConstantValues(array $values): string
+    {
+        $values = collect($values)->map(function (string $value) {
+            return "self::$value";
+        })->all();
 
-			// 判断该列是否标记为隐藏
-			if ($columnDefinition->isHide()) {
-				$this->hidden[] = $constantCode;
-			} else {
-				$this->fillable[] = $constantCode;
-			}
+        return implode(', ', $values);
+    }
 
-			$templates[] = $template;
-		}
-
-		return $this->tab(implode("\n", $templates), 1);
-	}
+    /**
+     * 获取 [Cascade] 磁盘路径
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    protected function cascadeDiskPath(array $values): string
+    {
+        return parent::cascadeDiskPath([
+            $this->configureParams->getEloquentTrace()->getFilepath(),
+            ...$values,
+        ]);
+    }
 
 }

@@ -2,163 +2,135 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
-use Illuminate\Support\Str;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Blueprint;
-use KanekiYuto\Handy\Cascade\ModelParams;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use function Laravel\Prompts\note;
-use function Laravel\Prompts\error;
-
-/**
- * 构建 - [Model]
- *
- * @author KanekiYuto
- */
-class ModelMake extends Make
+class ModelMake extends CascadeMake
 {
 
-	private array $casts = [];
+    private array $casts = [];
 
-	private array $packages = [];
+    private array $packages = [];
 
-	private ModelParams $modelParams;
+    public function boot(): void
+    {
+        $this->run('Model', 'model.base.stub', function () {
+            $className = $this->getDefaultClassName();
 
-	/**
-	 * construct
-	 *
-	 * @param  Blueprint    $blueprint
-	 * @param  ModelParams  $modelParams
-	 *
-	 * @return void
-	 */
-	public function __construct(Blueprint $blueprint, ModelParams $modelParams)
-	{
-		$this->modelParams = $modelParams;
-		parent::__construct($blueprint);
-	}
+            $this->stubParam('namespace', $this->getNamespace());
+            $this->stubParam('class', $className);
+            $this->stubParam('comment', '');
 
-	/**
-	 * 引导构建
-	 *
-	 * @return void
-	 */
-	public function boot(): void
-	{
-		parent::boot();
+            $this->stubParam(
+                'traceEloquent',
+                $this->getTraceEloquentMake()->getNamespaceClass()
+            );
 
-		note('开始创建 Model...');
+            $this->stubParam('timestamps', $this->modelParams->getTimestamps());
+            $this->stubParam('incrementing', $this->modelParams->getIncrementing());
+            $this->stubParam('extends', $this->modelParams->getExtends());
 
-		$stubsDisk = Builder::useDisk(Builder::getStubsPath());
-		$this->load($stubsDisk->get('model.base.stub'));
+            $this->stubParam('casts', $this->makeCasts());
+            $this->stubParam('usePackages', $this->makeUsePackages());
 
-		if (empty($this->stub)) {
-			error('创建失败...存根无效或不存在...');
-			return;
-		}
+            $this->stub = $this->formattingStub($this->stub);
 
-		$blueprint = $this->blueprint;
-		$modelParams = $this->modelParams;
+            $folderPath = $this->cascadeDiskPath([
+                $this->tableParams->getNamespace(),
+            ]);
 
-		$table = $blueprint->getTable();
-		$className = $this->getClassName($table, CascadeConst::MODEL_FILE_SUFFIX);
-		$namespace = $this->getNamespace($table, [
-			CascadeConst::CASCADE_NAMESPACE,
-			CascadeConst::MODEL_NAMESPACE,
-		]);
+            $this->isPut($this->filename($className), $folderPath);
+        });
+    }
 
-		// Do it...
-		$this->param('namespace', implode(CascadeConst::NAMESPACE_SEPARATOR, [
-			CascadeConst::APP_NAMESPACE,
-			$namespace,
-		]));
+    /**
+     * 获取默认的类名称
+     *
+     * @param  string  $suffix
+     *
+     * @return string
+     */
+    public function getDefaultClassName(string $suffix = ''): string
+    {
+        return parent::getDefaultClassName(empty($suffix) ? 'Model' : $suffix);
+    }
 
-		$this->param('class', $className);
-		$this->param('comment', $blueprint->getComment());
+    public function getNamespace(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+        ]);
+    }
 
-		$this->param('traceEloquent', $this->getPackage($table, [
-			CascadeConst::CASCADE_NAMESPACE,
-			CascadeConst::TRACE_NAMESPACE,
-			CascadeConst::TRACE_ELOQUENT_NAMESPACE,
-		], CascadeConst::TRACE_NAMESPACE));
+    /**
+     * 获取设置的命名空间
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    public function getConfigureNamespace(array $values): string
+    {
+        return parent::getConfigureNamespace([
+            $this->configureParams->getModel()->getNamespace(),
+            ...$values,
+        ]);
+    }
 
-		$this->param('table', $table);
+    private function makeCasts(): string
+    {
+        if (empty($this->casts)) {
+            return 'return array_merge(parent::casts(), []);';
+        }
 
-		$this->param('timestamps', $modelParams->isTimestamps());
-		$this->param('incrementing', $modelParams->isIncrementing());
-		$this->param('extends', $modelParams->getExtends());
+        $templates[] = 'return array_merge(parent::casts(), [';
 
-		$this->columns();
-		$this->param('casts', $this->casts());
-		$this->param('usePackages', $this->usePackages());
+        $casts = collect($this->casts)->map(function (string $value, string $key) {
 
-		$this->stub = $this->formattingStub($this->stub);
-		$this->putFile($namespace, $className);
-	}
+            if (class_exists($value)) {
+                $namespace = explode('\\', $value);
+                $className = $namespace[count($namespace) - 1];
+                $value = "$className::class";
+                $this->addPackage(implode('\\', $namespace));
+            } else {
+                $value = "'$value'";
+            }
 
-	private function columns(): void
-	{
-		$columns = $this->blueprint->getColumns();
+            return "\t$key => $value,";
+        })->all();
 
-		foreach ($columns as $column) {
-			$columnDefinition = $column->getColumnParams();
-			$cast = $columnDefinition->getCast();
+        $templates = array_merge($templates, $casts);
+        $templates[] = ']);';
 
-			$field = $columnDefinition->getField();
-			$constantCode = Str::of($field)->upper()->toString();
+        return implode("\n\t\t", $templates);
+    }
 
-			if (!empty($cast)) {
-				$this->casts["TheTrace::$constantCode"] = $cast;
-			}
-		}
-	}
+    private function addPackage(string $value): void
+    {
+        if (!in_array($value, $this->packages)) {
+            $this->packages[] = $value;
+        }
+    }
 
-	/**
-	 * 处理强制转换的属性
-	 *
-	 * @return string
-	 */
-	private function casts(): string
-	{
-		if (empty($this->casts)) {
-			return 'return array_merge(parent::casts(), []);';
-		}
+    private function makeUsePackages(): string
+    {
+        $packages = collect($this->packages)->map(function (string $value) {
+            return "use $value;";
+        })->all();
 
-		$templates[] = 'return array_merge(parent::casts(), [';
+        return implode("\n", $packages);
+    }
 
-		$casts = collect($this->casts)->map(function (string $value, string $key) {
-			if (class_exists($value)) {
-				$namespace = explode(CascadeConst::NAMESPACE_SEPARATOR, $value);
-				$className = $namespace[count($namespace) - 1];
-				$value = "$className::class";
-				$this->addPackage(implode(CascadeConst::NAMESPACE_SEPARATOR, $namespace));
-			} else {
-				$value = "'$value'";
-			}
-
-			return "\t$key => $value,";
-		})->all();
-
-		$templates = array_merge($templates, $casts);
-		$templates[] = ']);';
-
-		return implode("\n\t\t", $templates);
-	}
-
-	private function addPackage(string $value): void
-	{
-		if (!in_array($value, $this->packages)) {
-			$this->packages[] = $value;
-		}
-	}
-
-	private function usePackages(): string
-	{
-		$packages = collect($this->packages)->map(function (string $value) {
-			return "use $value;";
-		})->all();
-
-		return implode("\n", $packages);
-	}
+    /**
+     * 获取 [Cascade] 磁盘路径
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    protected function cascadeDiskPath(array $values): string
+    {
+        return parent::cascadeDiskPath([
+            $this->configureParams->getModel()->getFilepath(),
+            ...$values,
+        ]);
+    }
 
 }

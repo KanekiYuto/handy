@@ -2,33 +2,26 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
-use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
-use KanekiYuto\Handy\Cascade\Blueprint;
-use KanekiYuto\Handy\Cascade\Builder;
-use KanekiYuto\Handy\Cascade\Constants\CascadeConst;
-use KanekiYuto\Handy\Cascade\Contracts\Make as MakeInterface;
+use Closure;
+use KanekiYuto\Handy\Cascade\DiskManager;
+use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
+use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
+use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
+use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
+use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
+use KanekiYuto\Handy\Cascade\Contract\Make as MakeContract;
+use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
-use function Laravel\Prompts\info;
-use function Laravel\Prompts\warning;
 
 /**
- * Make abstract
+ * Make
  *
  * @author KanekiYuto
  */
-abstract class Make implements MakeInterface
+abstract class Make implements MakeContract
 {
 
-    use Template;
-
-    /**
-     * property
-     *
-     * @var Blueprint
-     */
-    protected readonly Blueprint $blueprint;
+    use Template, Helper;
 
     /**
      * property
@@ -38,231 +31,101 @@ abstract class Make implements MakeInterface
     protected string $stub;
 
     /**
+     * property
+     *
+     * @var ConfigureParams
+     */
+    protected ConfigureParams $configureParams;
+
+    /**
+     * property
+     *
+     * @var TableParams
+     */
+    protected TableParams $tableParams;
+
+    /**
+     * property
+     *
+     * @var MigrationParams
+     */
+    protected MigrationParams $migrationParams;
+
+    /**
+     * property
+     *
+     * @var ModelParams
+     */
+    protected ModelParams $modelParams;
+
+    /**
+     * property
+     *
+     * @var BlueprintParams
+     */
+    protected BlueprintParams $blueprintParams;
+
+    /**
      * construct
      *
-     * @param Blueprint $blueprint
+     * @param  ConfigureParams  $configureParams
+     * @param  BlueprintParams  $blueprintParams
+     * @param  TableParams      $tableParams
+     * @param  ModelParams      $modelParams
+     * @param  MigrationParams  $migrationParams
+     */
+    public function __construct(
+        ConfigureParams $configureParams,
+        BlueprintParams $blueprintParams,
+        TableParams $tableParams,
+        ModelParams $modelParams,
+        MigrationParams $migrationParams
+    ) {
+        $this->configureParams = $configureParams;
+        $this->blueprintParams = $blueprintParams;
+        $this->migrationParams = $migrationParams;
+        $this->tableParams = $tableParams;
+        $this->modelParams = $modelParams;
+    }
+
+    /**
+     * 运行构建
+     *
+     * @param  string   $name
+     * @param  string   $stub
+     * @param  Closure  $callable
      *
      * @return void
      */
-    public function __construct(Blueprint $blueprint)
+    protected function run(string $name, string $stub, Closure $callable): void
     {
-        $this->blueprint = $blueprint;
-    }
+        note("开始构建 $name...");
 
-    /**
-     * boot make
-     *
-     * @return void
-     */
-    public function boot(): void
-    {
-        // Do it...
-    }
+        $stubsDisk = DiskManager::stubDisk();
+        $this->load($stubsDisk->get($stub));
 
-    /**
-     * load param to the stub
-     *
-     * @param string $param
-     * @param string|bool $value
-     * @param bool $load
-     * @param string|null $stub
-     * @return string
-     */
-    public function param(string $param, string|bool $value, bool $load = true, string $stub = null): string
-    {
-        $value = match (gettype($value)) {
-            'boolean' => $this->boolConvertString($value),
-            default => $value
-        };
-
-        $replaceStub = $this->replace("{{ $param }}", $value, $stub);
-
-        if ($load) {
-            $this->load($replaceStub);
-        }
-
-        return $replaceStub;
-    }
-
-    /**
-     * bool convert string
-     *
-     * @param bool $bool
-     *
-     * @return string
-     */
-    protected final function boolConvertString(bool $bool): string
-    {
-        return $bool ? 'true' : 'false';
-    }
-
-    /**
-     * string replace
-     *
-     * @param string $search
-     * @param string $replace
-     * @param string|null $stub
-     *
-     * @return Stringable
-     */
-    protected final function replace(string $search, string $replace, string $stub = null): Stringable
-    {
-        if (empty($stub)) {
-            $stub = $this->stub;
-        }
-
-        return Str::of($stub)->replace($search, $replace);
-    }
-
-    /**
-     * load stub
-     *
-     * @param string|null $stub
-     *
-     * @return void
-     */
-    protected final function load(string|null $stub): void
-    {
-        if (!empty($stub)) {
-            $this->stub = $stub;
-        }
-    }
-
-    /**
-     * get the package name
-     *
-     * @param string $table
-     * @param array $namespace
-     * @param string $suffix
-     *
-     * @return string
-     */
-    protected final function getPackage(string $table, array $namespace, string $suffix = ''): string
-    {
-        return implode(CascadeConst::NAMESPACE_SEPARATOR, [
-            CascadeConst::APP_NAMESPACE,
-            $this->getNamespace($table, $namespace),
-            $this->getClassName($table, $suffix)
-        ]);
-    }
-
-    /**
-     * get the namespace
-     *
-     * @param string $table
-     * @param array $namespace
-     *
-     * @return string
-     */
-    protected final function getNamespace(string $table, array $namespace): string
-    {
-        $namespace = implode(CascadeConst::NAMESPACE_SEPARATOR, $namespace);
-
-        $className = Str::headline($table);
-        $className = explode(' ', $className);
-        $className = collect($className);
-
-        $className->pop();
-        $className = $className->all();
-
-        if (empty($className)) {
-            return '';
-        }
-
-        $className = implode(CascadeConst::NAMESPACE_SEPARATOR, $className);
-
-        return $namespace . CascadeConst::NAMESPACE_SEPARATOR . $className;
-    }
-
-    /**
-     * get the class name
-     *
-     * @param string $table
-     * @param string $suffix
-     *
-     * @return string
-     */
-    protected final function getClassName(string $table, string $suffix = ''): string
-    {
-        $className = explode('_', $table);
-
-        if (empty($className)) {
-            return '';
-        }
-
-        $className = collect($className)->last();
-        $className = Str::headline($className);
-
-        return $className . $suffix;
-    }
-
-    /**
-     * put stub to file
-     *
-     * @param string $namespace
-     * @param string $className
-     *
-     * @return void
-     */
-    protected final function putFile(string $namespace, string $className): void
-    {
-        $folderPath = implode(DIRECTORY_SEPARATOR, [
-            Builder::getAppPath(),
-            Builder::namespaceCoverFilePath($namespace)
-        ]);
-
-        $folderDisk = Builder::useDisk($folderPath);
-        $fileName = $this->filename($className);
-
-        $this->isPut($fileName, $folderPath, $folderDisk);
-    }
-
-    /**
-     * get the filename
-     *
-     * @param string $filename
-     * @param string $suffix
-     *
-     * @return string
-     */
-    protected final function filename(string $filename, string $suffix = 'php'): string
-    {
-        return "$filename.$suffix";
-    }
-
-    /**
-     * is put
-     *
-     * @param string $fileName
-     * @param string $folderPath
-     * @param Filesystem $folderDisk
-     *
-     * @return void
-     */
-    public function isPut(string $fileName, string $folderPath, Filesystem $folderDisk): void
-    {
-        $isPut = $this->put($fileName, $folderDisk);
-
-        if (!$isPut) {
-            error('创建失败...写入文件失败！');
+        if (empty($this->stub)) {
+            error('创建失败...存根无效或不存在...');
             return;
         }
 
-        info('创建...完成！');
-        warning("文件路径: [$folderPath/$fileName]");
+        $callable();
     }
 
     /**
-     * put the stub
+     * 获取 [TraceEloquentMake]
      *
-     * @param string $filename
-     * @param Filesystem $disk
-     *
-     * @return bool
+     * @return EloquentTraceMake
      */
-    protected final function put(string $filename, Filesystem $disk): bool
+    protected function getTraceEloquentMake(): EloquentTraceMake
     {
-        return $disk->put($filename, $this->stub);
+        return new EloquentTraceMake(
+            $this->configureParams,
+            $this->blueprintParams,
+            $this->tableParams,
+            $this->modelParams,
+            $this->migrationParams
+        );
     }
 
 }
