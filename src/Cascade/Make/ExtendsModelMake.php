@@ -8,9 +8,12 @@ class ExtendsModelMake extends CascadeMake
     public function boot(): void
     {
         $this->run('Extends Model', 'model.extends.stub', function () {
-            $className = $this->getDefaultClassName('ExtendsModel');
+            $configureParams = $this->configureParams;
+            $getExtendsModel = $configureParams->getExtendsModel();
+
+            $className = $this->getDefaultClassName($getExtendsModel->getClassSuffix());
             $namespace = $this->getConfigureNamespace([
-                $this->configureParams->getExtendsModel()->getNamespace(),
+                $getExtendsModel->getNamespace(),
                 $this->tableParams->getNamespace(),
             ]);
 
@@ -31,10 +34,13 @@ class ExtendsModelMake extends CascadeMake
 
     public function getNamespaceClass(): string
     {
+        $configureParams = $this->configureParams;
+        $getExtendsModel = $configureParams->getExtendsModel();
+
         return $this->getConfigureNamespace([
-            $this->configureParams->getExtendsModel()->getNamespace(),
+            $getExtendsModel->getNamespace(),
             $this->tableParams->getNamespace(),
-            $this->getDefaultClassName(),
+            $this->getDefaultClassName($getExtendsModel->getClassSuffix()),
         ]);
     }
 

@@ -11,12 +11,15 @@ class Model
 
     private string $filepath;
 
+    private string $classSuffix;
+
     public function __construct()
     {
         $this->namespace = 'Models';
         $this->filepath = Str::of($this->namespace)
             ->replace('\\', DIRECTORY_SEPARATOR)
             ->toString();
+        $this->classSuffix = 'Model';
     }
 
     public function getNamespace(): string
@@ -27,6 +30,11 @@ class Model
     public function getFilepath(): string
     {
         return $this->filepath;
+    }
+    
+    public function getClassSuffix(): string
+    {
+        return $this->classSuffix;
     }
 
 }

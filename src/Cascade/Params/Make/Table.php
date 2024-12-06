@@ -13,11 +13,14 @@ class Table
 
     private string $namespace;
 
+    private string $classname;
+
     public function __construct(string $table, string $comment)
     {
         $this->table = $table;
         $this->comment = $comment;
         $this->namespace = $this->setNamespace();
+        $this->classname = $this->setClassname();
     }
 
     private function setNamespace(): string
@@ -29,6 +32,14 @@ class Table
         return Str::of(Str::headline($table))
             ->replace(' ', '')
             ->toString();
+    }
+
+    private function setClassname(): string
+    {
+        // 取最后一个名称作为最终的类名
+        return Str::headline(collect(
+            explode('_', $this->table)
+        )->last());
     }
 
     public function getNamespace(): string
@@ -44,6 +55,11 @@ class Table
     public function getComment(): string
     {
         return $this->comment;
+    }
+
+    public function getClasName(): string
+    {
+        return $this->classname;
     }
 
 }
