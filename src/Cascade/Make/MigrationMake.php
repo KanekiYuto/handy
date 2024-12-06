@@ -124,7 +124,7 @@ class MigrationMake extends Make
                 'boolean' => $this->boolConvertString($val),
                 'array' => $this->makeArrayParams($val),
                 default => $val
-            } : "TheTrace::$val";
+            } : 'TheTrace::' . Str::upper($val);
 
             $parameters[] = $parameter . $val;
         }

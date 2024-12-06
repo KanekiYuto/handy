@@ -3,8 +3,8 @@
 namespace KanekiYuto\Handy\Cascade\Trait\Laravel;
 
 use stdClass;
+use Exception;
 use ReflectionMethod;
-use ReflectionException;
 use Illuminate\Support\Str;
 use function Laravel\Prompts\error;
 
@@ -24,23 +24,15 @@ trait Helper
     {
         $validParams = [];
 
-        $params = collect($params)->mapWithKeys(function (array $item, string $key) {
-            $key = Str::of($key)->replace('$', '')->toString();
-
-            return [$key => $item];
-        })->all();
-
         try {
             $method = new ReflectionMethod($class, $fn);
 
             foreach ($method->getParameters() as $param) {
                 $paramName = $param->getName();
+                $key = '$' . $paramName;
 
-                $key = isset($params['@quote' . $paramName]) ? '@quote' . $paramName : $paramName;
-
-                if (!isset($params[$key])){
-                    error('Cascade: error!!!');
-                    return (object) $validParams;
+                if (isset($params['@quote$' . $paramName])) {
+                    $key = '@quote$' . $paramName;
                 }
 
                 // 如果有设置默认值并且与默认值相等则不会被载入
@@ -48,9 +40,10 @@ trait Helper
                     continue;
                 }
 
-                $validParams[$key] = $params[$key];
+                $returnParamName = Str::of($key)->replace('$', '')->toString();
+                $validParams[$returnParamName] = $params[$key];
             }
-        } catch (ReflectionException $e) {
+        } catch (Exception $e) {
             error($e->getMessage());
         }
 
