@@ -96,7 +96,6 @@ class MigrationMake extends Make
     /**
      * 构建函数参数信息
      *
-     * @param  string    $fn
      * @param  stdClass  $values
      *
      * @return array
@@ -115,18 +114,16 @@ class MigrationMake extends Make
             $isQuote = Str::startsWith($key, '@quote');
             $key = $isQuote ? Str::of($key)->chopStart('@quote')->toString() : $key;
 
-            // 命名参数设置，避免顺序问题
-            $parameter = "$key: ";
-
             // 类型处理 | 如果是引用 [Trace] 会进行特殊处理
-            $val = $isQuote ? match (gettype($val)) {
+            $val = !$isQuote ? match (gettype($val)) {
                 'string' => "'$val'",
                 'boolean' => $this->boolConvertString($val),
                 'array' => $this->makeArrayParams($val),
                 default => $val
             } : 'TheTrace::' . Str::upper($val);
 
-            $parameters[] = $parameter . $val;
+            // 命名参数设置，避免顺序问题
+            $parameters = "$key: $val";
         }
 
         return $parameters;
