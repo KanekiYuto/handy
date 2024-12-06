@@ -13,11 +13,8 @@ class ModelMake extends CascadeMake
     {
         $this->run('Model', 'model.base.stub', function () {
             $className = $this->getDefaultClassName();
-            $namespace = $this->getConfigureNamespace([
-                $this->tableParams->getNamespace(),
-            ]);
 
-            $this->stubParam('namespace', $namespace);
+            $this->stubParam('namespace', $this->getNamespace());
             $this->stubParam('class', $className);
             $this->stubParam('comment', '');
 
@@ -37,6 +34,13 @@ class ModelMake extends CascadeMake
 
             $this->isPut($this->filename($className), $folderPath);
         });
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+        ]);
     }
 
     /**
@@ -62,6 +66,21 @@ class ModelMake extends CascadeMake
     {
         return parent::getConfigureNamespace([
             $this->configureParams->getModel()->getNamespace(),
+            ...$values,
+        ]);
+    }
+
+    /**
+     * 获取 [Cascade] 磁盘路径
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    protected function cascadeDiskPath(array $values): string
+    {
+        return parent::cascadeDiskPath([
+            $this->configureParams->getModel()->getFilepath(),
             ...$values,
         ]);
     }
