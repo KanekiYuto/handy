@@ -60,8 +60,7 @@ trait Template
         return $this->param(
             'value',
             $value,
-            false,
-            $this->param('const', $const, false, $stub)
+            $this->param('const', $const, $stub)
         );
     }
 
@@ -81,8 +80,7 @@ trait Template
         return $this->param(
             '@var',
             "@var " . $var,
-            false,
-            $this->param('comment', $comment, false, $stub)
+            $this->param('comment', $comment, $stub)
         );
     }
 

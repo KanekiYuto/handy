@@ -11,24 +11,60 @@ use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
+use KanekiYuto\Handy\Cascade\Contract\Make as MakeContract;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\error;
 
-class Make
+/**
+ * Make
+ *
+ * @author KanekiYuto
+ */
+abstract class Make implements MakeContract
 {
 
-    use Template;
+    use Template, Helper;
 
+    /**
+     * property
+     *
+     * @var string
+     */
     protected string $stub;
 
+    /**
+     * property
+     *
+     * @var ConfigureParams
+     */
     protected ConfigureParams $configureParams;
 
+    /**
+     * property
+     *
+     * @var TableParams
+     */
     protected TableParams $tableParams;
 
+    /**
+     * property
+     *
+     * @var MigrationParams
+     */
     protected MigrationParams $migrationParams;
 
+    /**
+     * property
+     *
+     * @var ModelParams
+     */
     protected ModelParams $modelParams;
 
+    /**
+     * property
+     *
+     * @var BlueprintParams
+     */
     protected BlueprintParams $blueprintParams;
 
     /**
@@ -55,13 +91,29 @@ class Make
     }
 
     /**
+     * 获取设置的命名空间
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    public function getConfigureNamespace(array $values): string
+    {
+        return implode('\\', [
+            $this->configureParams->getAppNamespace(),
+            $this->configureParams->getCascadeNamespace(),
+            ...$values,
+        ]);
+    }
+
+    /**
      * 获取一个默认的类名称 (根据表名称生成)
      *
      * @param  string  $suffix
      *
      * @return string
      */
-    public function getDefaultClassName(string $suffix = ''): string
+    protected function getDefaultClassName(string $suffix = ''): string
     {
         $table = $this->tableParams->getTable();
 
@@ -72,101 +124,6 @@ class Make
         $className = Str::headline($className);
 
         return $className . $suffix;
-    }
-
-    /**
-     * load param to the stub
-     *
-     * @param  string       $param
-     * @param  string|bool  $value
-     * @param  bool         $load
-     * @param  string|null  $stub
-     *
-     * @return string
-     */
-    public function param(string $param, string|bool $value, bool $load = true, string $stub = null): string
-    {
-        $value = match (gettype($value)) {
-            'boolean' => $this->boolConvertString($value),
-            default => $value
-        };
-
-        $replaceStub = $this->replace("{{ $param }}", $value, $stub);
-
-        if ($load) {
-            $this->load($replaceStub);
-        }
-
-        return $replaceStub;
-    }
-
-    /**
-     * 布尔值转换成字符串
-     *
-     * @param  bool  $bool
-     *
-     * @return string
-     */
-    protected final function boolConvertString(bool $bool): string
-    {
-        return $bool ? 'true' : 'false';
-    }
-
-    /**
-     * 字符串替换
-     *
-     * @param  string       $search
-     * @param  string       $replace
-     * @param  string|null  $stub
-     *
-     * @return string
-     */
-    protected final function replace(string $search, string $replace, string $stub = null): string
-    {
-        if (empty($stub)) {
-            $stub = $this->stub;
-        }
-
-        return Str::of($stub)
-            ->replace($search, $replace)
-            ->toString();
-    }
-
-    /**
-     * load stub
-     *
-     * @param  string|null  $stub
-     *
-     * @return void
-     */
-    protected final function load(string|null $stub): void
-    {
-        if (!empty($stub)) {
-            $this->stub = $stub;
-        }
-    }
-
-    public function getConfigureNamespace(array $values): string
-    {
-        return implode('\\', [
-            $this->configureParams->getAppNamespace(),
-            $this->configureParams->getCascadeNamespace(),
-            ...$values,
-        ]);
-    }
-
-    public final function getNamespace(): string
-    {
-        $table = $this->tableParams->getTable();
-
-        $table = explode('_', $table);
-        $table = collect($table)
-            ->except([count($table) - 1])
-            ->all();
-
-        $table = implode('\\', $table);
-
-        return Str::headline($table);
     }
 
     /**
@@ -193,6 +150,13 @@ class Make
         $callable();
     }
 
+    /**
+     * 获取 [Cascade] 磁盘
+     *
+     * @param  array  $values
+     *
+     * @return Filesystem
+     */
     protected function cascadeDisk(array $values): Filesystem
     {
         return DiskManager::useDisk(implode(DIRECTORY_SEPARATOR, [
@@ -200,47 +164,6 @@ class Make
             $this->configureParams->getCascadeFilepath(),
             ...$values,
         ]));
-    }
-
-    /**
-     * 获取默认的命名空间
-     *
-     * @param  array  $prefix
-     * @param  array  $suffix
-     *
-     * @return string
-     */
-    protected final function getDefaultNamespace(array $prefix, array $suffix = []): string
-    {
-        $table = $this->tableParams->getTable();
-
-        $table = explode('_', $table);
-        $table = collect($table)
-            ->except([count($table) - 1])
-            ->all();
-
-        $table = implode('\\', $table);
-        $table = Str::headline($table);
-
-        return implode('\\', [
-            'App\\Cascade',
-            ...$prefix,
-            $table,
-            ...$suffix,
-        ]);
-    }
-
-    /**
-     * get the filename
-     *
-     * @param  string  $filename
-     * @param  string  $suffix
-     *
-     * @return string
-     */
-    protected final function filename(string $filename, string $suffix = 'php'): string
-    {
-        return "$filename.$suffix";
     }
 
     protected function getTraceEloquent(): EloquentTraceMake

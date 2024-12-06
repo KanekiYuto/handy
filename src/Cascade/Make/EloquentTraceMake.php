@@ -6,7 +6,12 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 
-class EloquentTraceMake extends Make
+/**
+ * EloquentTrace
+ *
+ * @author KanekiYuto
+ */
+class EloquentTraceMake extends CascadeMake
 {
 
     /**
@@ -32,26 +37,33 @@ class EloquentTraceMake extends Make
     {
         $this->run('Eloquent Trace', 'eloquent-trace.stub', function () {
             $table = $this->blueprintParams->getTable();
-            $className = $this->getClassName();
+            $className = $this->getDefaultClassName();
+            $namespace = $this->getConfigureNamespace([
+                $this->tableParams->getNamespace(),
+            ]);
 
-            $this->param('class', $className);
-            $this->param('table', $table);
+            $this->stubParam('namespace', $namespace);
+            $this->stubParam('class', $className);
+            $this->stubParam('table', $table);
 
-            $this->param('namespace', $this->getConfigureNamespace([
-                $this->getNamespace(),
-            ]));
-
-            $this->param('primaryKey', 'self::ID');
-            $this->param('columns', $this->makeColumns());
-            $this->param('hidden', $this->makeHidden());
-            $this->param('fillable', $this->makeFillable());
+            $this->stubParam('primaryKey', 'self::ID');
+            $this->stubParam('columns', $this->makeColumns());
+            $this->stubParam('hidden', $this->makeHidden());
+            $this->stubParam('fillable', $this->makeFillable());
 
             $this->cascadeDisk([
-                $this->getNamespace(),
+                $this->tableParams->getNamespace(),
             ])->put($this->filename($className), $this->stub);
         });
     }
 
+    /**
+     * 获取设置的命名空间
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
     public function getConfigureNamespace(array $values): string
     {
         return parent::getConfigureNamespace([
@@ -122,6 +134,13 @@ class EloquentTraceMake extends Make
         return implode(', ', $fillable);
     }
 
+    /**
+     * 获取 [Cascade] 磁盘
+     *
+     * @param  array  $values
+     *
+     * @return Filesystem
+     */
     protected function cascadeDisk(array $values): Filesystem
     {
         return parent::cascadeDisk([
@@ -130,9 +149,9 @@ class EloquentTraceMake extends Make
         ]);
     }
 
-    public function getClassName(): string
+    protected function getDefaultClassName(string $suffix = ''): string
     {
-        return $this->getDefaultClassName('Trace');
+        return parent::getDefaultClassName($suffix ?? 'Trace');
     }
 
 }

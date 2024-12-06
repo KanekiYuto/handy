@@ -27,9 +27,9 @@ class MigrationMake extends Make
         $this->run('Migration', 'migration.stub', function () {
             $table = $this->tableParams->getTable();
 
-            $this->param('traceEloquent', $this->getTraceEloquentNamespace());
-            $this->param('comment', $this->migrationParams->getComment());
-            $this->param('blueprint', $this->makeColumns());
+            $this->stubParam('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->stubParam('comment', $this->migrationParams->getComment());
+            $this->stubParam('blueprint', $this->makeColumns());
 
             $folderDisk = DiskManager::migrationDisk();
             $fileName = $this->filename("cascade_create_{$table}_table");
@@ -48,8 +48,8 @@ class MigrationMake extends Make
         $make = $this->getTraceEloquent();
 
         return $make->getConfigureNamespace([
-            $make->getNamespace(),
-            $make->getClassName(),
+            $this->tableParams->getNamespace(),
+            $make->getDefaultClassName(),
         ]);
     }
 

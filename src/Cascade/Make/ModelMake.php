@@ -4,7 +4,7 @@ namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Contracts\Filesystem\Filesystem;
 
-class ModelMake extends Make
+class ModelMake extends CascadeMake
 {
 
     private array $casts = [];
@@ -15,26 +15,26 @@ class ModelMake extends Make
     {
         $this->run('Model', 'model.base.stub', function () {
             $className = $this->getClassName();
+            $namespace = $this->getConfigureNamespace([
+                $this->tableParams->getNamespace(),
+            ]);
 
-            $this->param('namespace', $this->getConfigureNamespace([
-                $this->getNamespace(),
-            ]));
+            $this->stubParam('namespace', $namespace);
+            $this->stubParam('class', $className);
+            $this->stubParam('comment', '');
 
-            $this->param('class', $className);
-            $this->param('comment', '');
+            $this->stubParam('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->stubParam('timestamps', $this->modelParams->getTimestamps());
+            $this->stubParam('incrementing', $this->modelParams->getIncrementing());
+            $this->stubParam('extends', $this->modelParams->getExtends());
 
-            $this->param('traceEloquent', $this->getTraceEloquentNamespace());
-            $this->param('timestamps', $this->modelParams->getTimestamps());
-            $this->param('incrementing', $this->modelParams->getIncrementing());
-            $this->param('extends', $this->modelParams->getExtends());
-
-            $this->param('casts', $this->makeCasts());
-            $this->param('usePackages', $this->makeUsePackages());
+            $this->stubParam('casts', $this->makeCasts());
+            $this->stubParam('usePackages', $this->makeUsePackages());
 
             $this->stub = $this->formattingStub($this->stub);
 
             $this->cascadeDisk([
-                $this->getNamespace(),
+                $this->tableParams->getNamespace(),
             ])->put($this->filename($className), $this->stub);
         });
     }
@@ -44,6 +44,13 @@ class ModelMake extends Make
         return $this->getDefaultClassName('Model');
     }
 
+    /**
+     * 获取设置的命名空间
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
     public function getConfigureNamespace(array $values): string
     {
         return parent::getConfigureNamespace([
@@ -57,8 +64,8 @@ class ModelMake extends Make
         $make = $this->getTraceEloquent();
 
         return $make->getConfigureNamespace([
-            $make->getNamespace(),
-            $make->getClassName(),
+            $this->tableParams->getNamespace(),
+            $make->getDefaultClassName(),
         ]);
     }
 
@@ -106,6 +113,13 @@ class ModelMake extends Make
         return implode("\n", $packages);
     }
 
+    /**
+     * 获取 [Cascade] 磁盘
+     *
+     * @param  array  $values
+     *
+     * @return Filesystem
+     */
     protected function cascadeDisk(array $values): Filesystem
     {
         return parent::cascadeDisk([
