@@ -2,8 +2,6 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
-
 class ModelMake extends CascadeMake
 {
 
@@ -23,7 +21,7 @@ class ModelMake extends CascadeMake
             $this->stubParam('class', $className);
             $this->stubParam('comment', '');
 
-            $this->stubParam('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->stubParam('traceEloquent', $this->getTraceEloquentMake()->getNamespace());
             $this->stubParam('timestamps', $this->modelParams->getTimestamps());
             $this->stubParam('incrementing', $this->modelParams->getIncrementing());
             $this->stubParam('extends', $this->modelParams->getExtends());
@@ -33,12 +31,21 @@ class ModelMake extends CascadeMake
 
             $this->stub = $this->formattingStub($this->stub);
 
-            $this->cascadeDisk([
+            $folderPath = $this->cascadeDiskPath([
                 $this->tableParams->getNamespace(),
-            ])->put($this->filename($className), $this->stub);
+            ]);
+
+            $this->isPut($this->filename($className), $folderPath);
         });
     }
 
+    /**
+     * 获取默认的类名称
+     *
+     * @param  string  $suffix
+     *
+     * @return string
+     */
     public function getDefaultClassName(string $suffix = ''): string
     {
         return parent::getDefaultClassName(empty($suffix) ? 'Model' : $suffix);
@@ -56,16 +63,6 @@ class ModelMake extends CascadeMake
         return parent::getConfigureNamespace([
             $this->configureParams->getModel()->getNamespace(),
             ...$values,
-        ]);
-    }
-
-    public function getTraceEloquentNamespace(): string
-    {
-        $make = $this->getTraceEloquent();
-
-        return $make->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-            $make->getDefaultClassName(),
         ]);
     }
 
@@ -111,21 +108,6 @@ class ModelMake extends CascadeMake
         })->all();
 
         return implode("\n", $packages);
-    }
-
-    /**
-     * 获取 [Cascade] 磁盘
-     *
-     * @param  array  $values
-     *
-     * @return Filesystem
-     */
-    protected function cascadeDisk(array $values): Filesystem
-    {
-        return parent::cascadeDisk([
-            $this->configureParams->getModel()->getFilepath(),
-            ...$values,
-        ]);
     }
 
 }

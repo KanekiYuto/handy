@@ -27,7 +27,7 @@ class MigrationMake extends Make
         $this->run('Migration', 'migration.stub', function () {
             $table = $this->tableParams->getTable();
 
-            $this->stubParam('traceEloquent', $this->getTraceEloquentNamespace());
+            $this->stubParam('traceEloquent', $this->getTraceEloquentMake()->getNamespace());
             $this->stubParam('comment', $this->migrationParams->getComment());
             $this->stubParam('blueprint', $this->makeColumns());
 
@@ -41,16 +41,6 @@ class MigrationMake extends Make
 
             info('创建...完成！');
         });
-    }
-
-    public function getTraceEloquentNamespace(): string
-    {
-        $make = $this->getTraceEloquent();
-
-        return $make->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-            $make->getDefaultClassName(),
-        ]);
     }
 
     /**

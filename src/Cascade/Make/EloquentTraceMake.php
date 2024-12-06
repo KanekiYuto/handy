@@ -3,7 +3,6 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Column as ColumnParams;
 
 /**
@@ -38,26 +37,32 @@ class EloquentTraceMake extends CascadeMake
         $this->run('Eloquent Trace', 'eloquent-trace.stub', function () {
             $table = $this->blueprintParams->getTable();
             $className = $this->getDefaultClassName();
-            $namespace = $this->getConfigureNamespace([
-                $this->tableParams->getNamespace(),
-            ]);
 
-            $this->stubParam('namespace', $namespace);
+            $this->stubParam('namespace', $this->getNamespace());
             $this->stubParam('class', $className);
             $this->stubParam('table', $table);
 
             $this->stubParam('primaryKey', 'self::ID');
             $this->stubParam('columns', $this->makeColumns());
-            $this->stubParam('hidden', $this->makeHidden());
-            $this->stubParam('fillable', $this->makeFillable());
+            $this->stubParam('hidden', $this->makeConstantValues($this->hidden));
+            $this->stubParam('fillable', $this->makeConstantValues($this->fillable));
 
-            $this->cascadeDisk([
+            $folderPath = $this->cascadeDiskPath([
                 $this->tableParams->getNamespace(),
-            ])->put($this->filename($className), $this->stub);
+            ]);
+
+            $this->isPut($this->filename($className), $folderPath);
         });
     }
 
-    protected function getDefaultClassName(string $suffix = ''): string
+    /**
+     * 获取默认的类名称
+     *
+     * @param  string  $suffix
+     *
+     * @return string
+     */
+    public function getDefaultClassName(string $suffix = ''): string
     {
         return parent::getDefaultClassName(empty($suffix) ? 'Trace' : $suffix);
     }
@@ -74,6 +79,13 @@ class EloquentTraceMake extends CascadeMake
         return parent::getConfigureNamespace([
             $this->configureParams->getEloquentTrace()->getNamespace(),
             ...$values,
+        ]);
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
         ]);
     }
 
@@ -121,34 +133,32 @@ class EloquentTraceMake extends CascadeMake
         return $template;
     }
 
-    public function makeHidden(): string
-    {
-        $hidden = collect($this->hidden)->map(function (string $value) {
-            return "self::$value";
-        })->all();
-
-        return implode(', ', $hidden);
-    }
-
-    public function makeFillable(): string
-    {
-        $fillable = collect($this->fillable)->map(function (string $value) {
-            return "self::$value";
-        })->all();
-
-        return implode(', ', $fillable);
-    }
-
     /**
-     * 获取 [Cascade] 磁盘
+     * 构建常量值
      *
      * @param  array  $values
      *
-     * @return Filesystem
+     * @return string
      */
-    protected function cascadeDisk(array $values): Filesystem
+    private function makeConstantValues(array $values): string
     {
-        return parent::cascadeDisk([
+        $values = collect($values)->map(function (string $value) {
+            return "self::$value";
+        })->all();
+
+        return implode(', ', $values);
+    }
+
+    /**
+     * 获取 [Cascade] 磁盘路径
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    protected function cascadeDiskPath(array $values): string
+    {
+        return parent::cascadeDiskPath([
             $this->configureParams->getEloquentTrace()->getFilepath(),
             ...$values,
         ]);

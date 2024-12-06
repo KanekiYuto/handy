@@ -3,9 +3,7 @@
 namespace KanekiYuto\Handy\Cascade\Make;
 
 use Closure;
-use Illuminate\Support\Str;
 use KanekiYuto\Handy\Cascade\DiskManager;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
@@ -91,42 +89,6 @@ abstract class Make implements MakeContract
     }
 
     /**
-     * 获取设置的命名空间
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    public function getConfigureNamespace(array $values): string
-    {
-        return implode('\\', [
-            $this->configureParams->getAppNamespace(),
-            $this->configureParams->getCascadeNamespace(),
-            ...$values,
-        ]);
-    }
-
-    /**
-     * 获取一个默认的类名称 (根据表名称生成)
-     *
-     * @param  string  $suffix
-     *
-     * @return string
-     */
-    protected function getDefaultClassName(string $suffix = ''): string
-    {
-        $table = $this->tableParams->getTable();
-
-        $className = explode('_', $table);
-
-        // 取最后一个名称作为最终的类名
-        $className = collect($className)->last();
-        $className = Str::headline($className);
-
-        return $className . $suffix;
-    }
-
-    /**
      * 运行构建
      *
      * @param  string   $name
@@ -151,22 +113,11 @@ abstract class Make implements MakeContract
     }
 
     /**
-     * 获取 [Cascade] 磁盘
+     * 获取 [TraceEloquentMake]
      *
-     * @param  array  $values
-     *
-     * @return Filesystem
+     * @return EloquentTraceMake
      */
-    protected function cascadeDisk(array $values): Filesystem
-    {
-        return DiskManager::useDisk(implode(DIRECTORY_SEPARATOR, [
-            $this->configureParams->getAppFilepath(),
-            $this->configureParams->getCascadeFilepath(),
-            ...$values,
-        ]));
-    }
-
-    protected function getTraceEloquent(): EloquentTraceMake
+    protected function getTraceEloquentMake(): EloquentTraceMake
     {
         return new EloquentTraceMake(
             $this->configureParams,
