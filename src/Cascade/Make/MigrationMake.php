@@ -82,7 +82,7 @@ class MigrationMake extends Make
             $template .= "->$fn(";
             $template .= implode(
                 ', ',
-                $this->makeParameters($fn, $params)
+                $this->makeParameters($params)
             );
 
             $template .= ')';
@@ -101,7 +101,7 @@ class MigrationMake extends Make
      *
      * @return array
      */
-    public function makeParameters(string $fn, stdClass $values): array
+    public function makeParameters(stdClass $values): array
     {
         $parameters = [];
 
