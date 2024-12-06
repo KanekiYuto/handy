@@ -24,7 +24,7 @@ class Table
     {
         $table = explode('_', $this->table);
         $table = collect($table)->except([count($table) - 1])->all();
-        $table = implode('\\', $table);
+        $table = implode('', $table);
 
         return Str::headline($table);
     }

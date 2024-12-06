@@ -7,7 +7,7 @@ class ExtendsModelMake extends CascadeMake
 
     public function boot(): void
     {
-        $this->run('Model', 'model.base.stub', function () {
+        $this->run('Extends Model', 'model.extends.stub', function () {
             $className = $this->getDefaultClassName();
 
             $this->stubParam('namespace', $this->getNamespace());
