@@ -123,7 +123,7 @@ class MigrationMake extends Make
             } : 'TheTrace::' . Str::upper($val);
 
             // 命名参数设置，避免顺序问题
-            $parameters = "$key: $val";
+            $parameters[] = "$key: $val";
         }
 
         return $parameters;

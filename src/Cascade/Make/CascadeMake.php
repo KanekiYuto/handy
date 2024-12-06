@@ -73,6 +73,10 @@ abstract class CascadeMake extends Make
      */
     protected final function isPut(string $fileName, string $folderPath): void
     {
+        $folderPath = Str::of($folderPath)
+            ->replace('\\', DIRECTORY_SEPARATOR)
+            ->toString();
+
         $folderDisk = DiskManager::useDisk($folderPath);
 
         if (!$folderDisk->put($fileName, $this->stub)) {

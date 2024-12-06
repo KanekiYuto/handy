@@ -1,16 +1,16 @@
 <?php
 
-namespace KanekiYuto\Handy\Foundation\Database\Eloquent;
+namespace {{ namespace }};
 
-use Illuminate\Database\Eloquent\Model as BaseModel;
+use {{ extends }} as Model;
 use KanekiYuto\Handy\Trace\TraceEloquent;
 
 /**
- * Base model
+ * Cascade generation
  *
  * @author KanekiYuto
  */
-class Model extends BaseModel
+class {{ class }} extends Model
 {
 
 	/**
