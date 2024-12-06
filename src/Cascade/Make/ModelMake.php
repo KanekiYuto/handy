@@ -28,7 +28,7 @@ class ModelMake extends CascadeMake
 
             $this->stubParam(
                 'extends',
-                $this->getTraceEloquentMake()->getNamespaceClass()
+                $this->getExtendsModelMake()->getNamespaceClass()
             );
 
             $this->stubParam('casts', $this->makeCasts());
