@@ -31,6 +31,14 @@ class ExtendsModelMake extends CascadeMake
         ]);
     }
 
+    public function getNamespaceClass(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+            $this->getDefaultClassName()
+        ]);
+    }
+
     /**
      * 获取默认的类名称
      *

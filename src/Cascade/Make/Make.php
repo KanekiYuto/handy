@@ -128,4 +128,20 @@ abstract class Make implements MakeContract
         );
     }
 
+    /**
+     * 获取 [TraceEloquentMake]
+     *
+     * @return ExtendsModelMake
+     */
+    protected function getExtendsModelMake(): ExtendsModelMake
+    {
+        return new ExtendsModelMake(
+            $this->configureParams,
+            $this->blueprintParams,
+            $this->tableParams,
+            $this->modelParams,
+            $this->migrationParams
+        );
+    }
+
 }

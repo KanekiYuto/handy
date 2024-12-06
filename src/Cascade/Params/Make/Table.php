@@ -24,9 +24,11 @@ class Table
     {
         $table = explode('_', $this->table);
         $table = collect($table)->except([count($table) - 1])->all();
-        $table = implode('', $table);
+        $table = implode('_', $table);
 
-        return Str::headline($table);
+        return Str::of(Str::headline($table))
+            ->replace(' ', '')
+            ->toString();
     }
 
     public function getNamespace(): string
