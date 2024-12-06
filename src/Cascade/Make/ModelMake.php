@@ -14,7 +14,7 @@ class ModelMake extends CascadeMake
     public function boot(): void
     {
         $this->run('Model', 'model.base.stub', function () {
-            $className = $this->getClassName();
+            $className = $this->getDefaultClassName();
             $namespace = $this->getConfigureNamespace([
                 $this->tableParams->getNamespace(),
             ]);
@@ -39,9 +39,9 @@ class ModelMake extends CascadeMake
         });
     }
 
-    public function getClassName(): string
+    public function getDefaultClassName(string $suffix = ''): string
     {
-        return $this->getDefaultClassName('Model');
+        return parent::getDefaultClassName(empty($suffix) ? 'Model' : $suffix);
     }
 
     /**

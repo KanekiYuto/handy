@@ -13,16 +13,16 @@ trait Helper
      * @param  string       $param
      * @param  string|bool  $value
      *
-     * @return string
+     * @return void
      */
-    public function stubParam(string $param, string|bool $value): string
+    public function stubParam(string $param, string|bool $value): void
     {
         $value = match (gettype($value)) {
             'boolean' => $this->boolConvertString($value),
             default => $value
         };
 
-        return Str::of($this->stub)
+        $this->stub = Str::of($this->stub)
             ->replace("{{ $param }}", $value)
             ->toString();
     }

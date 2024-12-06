@@ -57,6 +57,11 @@ class EloquentTraceMake extends CascadeMake
         });
     }
 
+    protected function getDefaultClassName(string $suffix = ''): string
+    {
+        return parent::getDefaultClassName(empty($suffix) ? 'Trace' : $suffix);
+    }
+
     /**
      * 获取设置的命名空间
      *
@@ -147,11 +152,6 @@ class EloquentTraceMake extends CascadeMake
             $this->configureParams->getEloquentTrace()->getFilepath(),
             ...$values,
         ]);
-    }
-
-    protected function getDefaultClassName(string $suffix = ''): string
-    {
-        return parent::getDefaultClassName($suffix ?? 'Trace');
     }
 
 }
