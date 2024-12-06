@@ -89,6 +89,14 @@ class EloquentTraceMake extends CascadeMake
         ]);
     }
 
+    public function getNamespaceClass(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+            $this->getDefaultClassName()
+        ]);
+    }
+
     /**
      * 构建所有列信息
      *

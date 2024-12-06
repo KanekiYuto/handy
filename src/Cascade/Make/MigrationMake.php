@@ -27,7 +27,11 @@ class MigrationMake extends Make
         $this->run('Migration', 'migration.stub', function () {
             $table = $this->tableParams->getTable();
 
-            $this->stubParam('traceEloquent', $this->getTraceEloquentMake()->getNamespace());
+            $this->stubParam(
+                'traceEloquent',
+                $this->getTraceEloquentMake()->getNamespaceClass()
+            );
+            
             $this->stubParam('comment', $this->migrationParams->getComment());
             $this->stubParam('blueprint', $this->makeColumns());
 

@@ -18,7 +18,11 @@ class ModelMake extends CascadeMake
             $this->stubParam('class', $className);
             $this->stubParam('comment', '');
 
-            $this->stubParam('traceEloquent', $this->getTraceEloquentMake()->getNamespace());
+            $this->stubParam(
+                'traceEloquent',
+                $this->getTraceEloquentMake()->getNamespaceClass()
+            );
+
             $this->stubParam('timestamps', $this->modelParams->getTimestamps());
             $this->stubParam('incrementing', $this->modelParams->getIncrementing());
             $this->stubParam('extends', $this->modelParams->getExtends());
@@ -36,13 +40,6 @@ class ModelMake extends CascadeMake
         });
     }
 
-    public function getNamespace(): string
-    {
-        return $this->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-        ]);
-    }
-
     /**
      * 获取默认的类名称
      *
@@ -53,6 +50,13 @@ class ModelMake extends CascadeMake
     public function getDefaultClassName(string $suffix = ''): string
     {
         return parent::getDefaultClassName(empty($suffix) ? 'Model' : $suffix);
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+        ]);
     }
 
     /**
@@ -66,21 +70,6 @@ class ModelMake extends CascadeMake
     {
         return parent::getConfigureNamespace([
             $this->configureParams->getModel()->getNamespace(),
-            ...$values,
-        ]);
-    }
-
-    /**
-     * 获取 [Cascade] 磁盘路径
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    protected function cascadeDiskPath(array $values): string
-    {
-        return parent::cascadeDiskPath([
-            $this->configureParams->getModel()->getFilepath(),
             ...$values,
         ]);
     }
@@ -127,6 +116,21 @@ class ModelMake extends CascadeMake
         })->all();
 
         return implode("\n", $packages);
+    }
+
+    /**
+     * 获取 [Cascade] 磁盘路径
+     *
+     * @param  array  $values
+     *
+     * @return string
+     */
+    protected function cascadeDiskPath(array $values): string
+    {
+        return parent::cascadeDiskPath([
+            $this->configureParams->getModel()->getFilepath(),
+            ...$values,
+        ]);
     }
 
 }
