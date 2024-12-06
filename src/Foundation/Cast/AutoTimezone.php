@@ -7,7 +7,7 @@ use DateTimeZone;
 use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
-use KanekiYuto\Diverse\Support\IdeIgnore;
+use KanekiYuto\Handy\Support\IdeIgnore;
 
 /**
  * Automatic time zone switching
