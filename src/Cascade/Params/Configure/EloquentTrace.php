@@ -11,12 +11,15 @@ class EloquentTrace
 
     private string $filepath;
 
+    private string $classSuffix;
+
     public function __construct()
     {
         $this->namespace = 'Trace\\Eloquent';
         $this->filepath = Str::of($this->namespace)
             ->replace('\\', DIRECTORY_SEPARATOR)
             ->toString();
+        $this->classSuffix = 'Trace';
     }
 
     public function getNamespace(): string
@@ -27,6 +30,11 @@ class EloquentTrace
     public function getFilepath(): string
     {
         return $this->filepath;
+    }
+
+    public function getClassSuffix(): string
+    {
+        return $this->classSuffix;
     }
 
 }

@@ -35,10 +35,18 @@ class EloquentTraceMake extends CascadeMake
     public function boot(): void
     {
         $this->run('Eloquent Trace', 'eloquent-trace.stub', function () {
-            $table = $this->blueprintParams->getTable();
-            $className = $this->getDefaultClassName();
+            $configureParams = $this->configureParams;
+            $getMakeParams = $configureParams->getEloquentTrace();
 
-            $this->stubParam('namespace', $this->getNamespace());
+            $className = $this->getDefaultClassName($getMakeParams->getClassSuffix());
+            $namespace = $this->getConfigureNamespace([
+                $getMakeParams->getNamespace(),
+                $this->tableParams->getNamespace(),
+            ]);
+
+            $table = $this->tableParams->getTable();
+
+            $this->stubParam('namespace', $namespace);
             $this->stubParam('class', $className);
             $this->stubParam('table', $table);
 
@@ -48,53 +56,12 @@ class EloquentTraceMake extends CascadeMake
             $this->stubParam('fillable', $this->makeConstantValues($this->fillable));
 
             $folderPath = $this->cascadeDiskPath([
+                $getMakeParams->getFilepath(),
                 $this->tableParams->getNamespace(),
             ]);
 
             $this->isPut($this->filename($className), $folderPath);
         });
-    }
-
-    /**
-     * 获取默认的类名称
-     *
-     * @param  string  $suffix
-     *
-     * @return string
-     */
-    public function getDefaultClassName(string $suffix = ''): string
-    {
-        return parent::getDefaultClassName(empty($suffix) ? 'Trace' : $suffix);
-    }
-
-    /**
-     * 获取设置的命名空间
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    public function getConfigureNamespace(array $values): string
-    {
-        return parent::getConfigureNamespace([
-            $this->configureParams->getEloquentTrace()->getNamespace(),
-            ...$values,
-        ]);
-    }
-
-    public function getNamespace(): string
-    {
-        return $this->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-        ]);
-    }
-
-    public function getNamespaceClass(): string
-    {
-        return $this->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-            $this->getDefaultClassName()
-        ]);
     }
 
     /**
@@ -157,18 +124,11 @@ class EloquentTraceMake extends CascadeMake
         return implode(', ', $values);
     }
 
-    /**
-     * 获取 [Cascade] 磁盘路径
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    protected function cascadeDiskPath(array $values): string
+    public function getPackage(): string
     {
-        return parent::cascadeDiskPath([
-            $this->configureParams->getEloquentTrace()->getFilepath(),
-            ...$values,
+        return $this->getConfigureNamespace([
+            $this->tableParams->getNamespace(),
+            $this->getDefaultClassName($this->configureParams->getEloquentTrace()->getClassSuffix()),
         ]);
     }
 

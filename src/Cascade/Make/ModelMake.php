@@ -12,15 +12,22 @@ class ModelMake extends CascadeMake
     public function boot(): void
     {
         $this->run('Model', 'model.base.stub', function () {
-            $className = $this->getDefaultClassName();
+            $configureParams = $this->configureParams;
+            $getMakeParams = $configureParams->getModel();
 
-            $this->stubParam('namespace', $this->getNamespace());
+            $className = $this->getDefaultClassName($getMakeParams->getClassSuffix());
+            $namespace = $this->getConfigureNamespace([
+                $getMakeParams->getNamespace(),
+                $this->tableParams->getNamespace(),
+            ]);
+
+            $this->stubParam('namespace', $namespace);
             $this->stubParam('class', $className);
             $this->stubParam('comment', '');
 
             $this->stubParam(
                 'traceEloquent',
-                $this->getTraceEloquentMake()->getNamespaceClass()
+                $this->getTraceEloquentMake()->getPackage()
             );
 
             $this->stubParam('timestamps', $this->modelParams->getTimestamps());
@@ -28,7 +35,7 @@ class ModelMake extends CascadeMake
 
             $this->stubParam(
                 'extends',
-                $this->getExtendsModelMake()->getNamespaceClass()
+                $this->getExtendsModelMake()->getPackage()
             );
 
             $this->stubParam('casts', $this->makeCasts());
@@ -37,45 +44,12 @@ class ModelMake extends CascadeMake
             $this->stub = $this->formattingStub($this->stub);
 
             $folderPath = $this->cascadeDiskPath([
+                $getMakeParams->getFilepath(),
                 $this->tableParams->getNamespace(),
             ]);
 
             $this->isPut($this->filename($className), $folderPath);
         });
-    }
-
-    /**
-     * 获取默认的类名称
-     *
-     * @param  string  $suffix
-     *
-     * @return string
-     */
-    public function getDefaultClassName(string $suffix = ''): string
-    {
-        return parent::getDefaultClassName(empty($suffix) ? 'Model' : $suffix);
-    }
-
-    public function getNamespace(): string
-    {
-        return $this->getConfigureNamespace([
-            $this->tableParams->getNamespace(),
-        ]);
-    }
-
-    /**
-     * 获取设置的命名空间
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    public function getConfigureNamespace(array $values): string
-    {
-        return parent::getConfigureNamespace([
-            $this->configureParams->getModel()->getNamespace(),
-            ...$values,
-        ]);
     }
 
     private function makeCasts(): string
@@ -120,21 +94,6 @@ class ModelMake extends CascadeMake
         })->all();
 
         return implode("\n", $packages);
-    }
-
-    /**
-     * 获取 [Cascade] 磁盘路径
-     *
-     * @param  array  $values
-     *
-     * @return string
-     */
-    protected function cascadeDiskPath(array $values): string
-    {
-        return parent::cascadeDiskPath([
-            $this->configureParams->getModel()->getFilepath(),
-            ...$values,
-        ]);
     }
 
 }

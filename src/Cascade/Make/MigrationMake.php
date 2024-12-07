@@ -29,7 +29,7 @@ class MigrationMake extends Make
 
             $this->stubParam(
                 'traceEloquent',
-                $this->getTraceEloquentMake()->getNamespaceClass()
+                $this->getTraceEloquentMake()->getPackage()
             );
 
             $this->stubParam('comment', $this->migrationParams->getComment());

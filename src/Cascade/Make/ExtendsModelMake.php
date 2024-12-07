@@ -9,11 +9,11 @@ class ExtendsModelMake extends CascadeMake
     {
         $this->run('Extends Model', 'model.extends.stub', function () {
             $configureParams = $this->configureParams;
-            $getExtendsModel = $configureParams->getExtendsModel();
+            $getMakeParams = $configureParams->getExtendsModel();
 
-            $className = $this->getDefaultClassName($getExtendsModel->getClassSuffix());
+            $className = $this->getDefaultClassName($getMakeParams->getClassSuffix());
             $namespace = $this->getConfigureNamespace([
-                $getExtendsModel->getNamespace(),
+                $getMakeParams->getNamespace(),
                 $this->tableParams->getNamespace(),
             ]);
 
@@ -24,7 +24,7 @@ class ExtendsModelMake extends CascadeMake
             $this->stub = $this->formattingStub($this->stub);
 
             $folderPath = $this->cascadeDiskPath([
-                $this->configureParams->getExtendsModel()->getFilepath(),
+                $getMakeParams->getFilepath(),
                 $this->tableParams->getNamespace(),
             ]);
 
@@ -33,6 +33,18 @@ class ExtendsModelMake extends CascadeMake
     }
 
     public function getNamespaceClass(): string
+    {
+        $configureParams = $this->configureParams;
+        $getExtendsModel = $configureParams->getExtendsModel();
+
+        return $this->getConfigureNamespace([
+            $getExtendsModel->getNamespace(),
+            $this->tableParams->getNamespace(),
+            $this->getDefaultClassName($getExtendsModel->getClassSuffix()),
+        ]);
+    }
+
+    public function getPackage(): string
     {
         $configureParams = $this->configureParams;
         $getExtendsModel = $configureParams->getExtendsModel();
