@@ -35,7 +35,7 @@ class ModelMake extends CascadeMake
 
             $this->stubParam(
                 'extends',
-                $this->getExtendsModelMake()->getPackage()
+                $this->modelParams->getExtends()
             );
 
             $this->stubParam('casts', $this->makeCasts());

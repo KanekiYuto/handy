@@ -2,7 +2,7 @@
 
 namespace KanekiYuto\Handy\Cascade\Params\Make;
 
-use KanekiYuto\Handy\Cascade\Make\ModelActivity;
+use KanekiYuto\Handy\Cascade\ModelActivity;
 
 class Model
 {

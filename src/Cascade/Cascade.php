@@ -5,7 +5,6 @@ namespace KanekiYuto\Handy\Cascade;
 use Closure;
 use KanekiYuto\Handy\Cascade\Make\ModelMake;
 use KanekiYuto\Handy\Cascade\Make\MigrationMake;
-use KanekiYuto\Handy\Cascade\Make\ModelActivity;
 use KanekiYuto\Handy\Cascade\Make\ExtendsModelMake;
 use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
@@ -51,7 +50,6 @@ class Cascade
             false,
             false
         );
-
         $this->blueprintParams = new BlueprintParams('default', '', fn() => null);
     }
 

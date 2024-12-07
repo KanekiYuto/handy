@@ -5,8 +5,8 @@ namespace KanekiYuto\Handy\Foundation\Activity;
 use KanekiYuto\Handy\Support\Timestamp;
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
-use KanekiYuto\Handy\Cascade\Make\ModelActivity;
-use KanekiYuto\Handy\Foundation\Database\Eloquent\Model as EloquentModel;
+use KanekiYuto\Handy\Cascade\ModelActivity;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 /**
  * 基础的模型生命周期
