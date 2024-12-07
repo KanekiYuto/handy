@@ -4,6 +4,7 @@ namespace KanekiYuto\Handy\Foundation\Database\Eloquent;
 
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use KanekiYuto\Handy\Trace\TraceEloquent;
+use KanekiYuto\Handy\Cascade\Concerns\HasEloquentTrace;
 
 /**
  * Base model
@@ -12,6 +13,8 @@ use KanekiYuto\Handy\Trace\TraceEloquent;
  */
 class Model extends BaseModel
 {
+
+    use HasEloquentTrace;
 
 	/**
 	 * Trace class

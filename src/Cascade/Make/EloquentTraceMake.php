@@ -124,9 +124,15 @@ class EloquentTraceMake extends CascadeMake
         return implode(', ', $values);
     }
 
+    /**
+     * 获取引入的包完整名称
+     *
+     * @return string
+     */
     public function getPackage(): string
     {
         return $this->getConfigureNamespace([
+            $this->configureParams->getEloquentTrace()->getNamespace(),
             $this->tableParams->getNamespace(),
             $this->getDefaultClassName($this->configureParams->getEloquentTrace()->getClassSuffix()),
         ]);

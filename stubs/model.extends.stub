@@ -3,21 +3,16 @@
 namespace {{ namespace }};
 
 use {{ extends }} as Model;
-use KanekiYuto\Handy\Trace\TraceEloquent;
+use KanekiYuto\Handy\Cascade\Concerns\HasEloquentTrace;
 
 /**
- * Cascade generation
+ * [Cascade] 执行生成 - 建议不要改动此文件
  *
  * @author KanekiYuto
  */
 class {{ class }} extends Model
 {
 
-	/**
-	 * Trace class
-	 *
-	 * @var string<TraceEloquent>
-	 */
-	protected string $trace;
+    use HasEloquentTrace;
 
 }

@@ -18,7 +18,7 @@ abstract class CascadeMake extends Make
      *
      * @return string
      */
-    public function getConfigureNamespace(array $values): string
+    protected final function getConfigureNamespace(array $values): string
     {
         return implode('\\', [
             $this->configureParams->getAppNamespace(),
@@ -34,7 +34,7 @@ abstract class CascadeMake extends Make
      *
      * @return string
      */
-    public function getDefaultClassName(string $suffix = ''): string
+    protected final function getDefaultClassName(string $suffix = ''): string
     {
         $table = $this->tableParams->getTable();
 
@@ -54,7 +54,7 @@ abstract class CascadeMake extends Make
      *
      * @return string
      */
-    protected function cascadeDiskPath(array $values): string
+    protected final function cascadeDiskPath(array $values): string
     {
         return implode(DIRECTORY_SEPARATOR, [
             $this->configureParams->getAppFilepath(),

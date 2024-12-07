@@ -32,27 +32,20 @@ class ExtendsModelMake extends CascadeMake
         });
     }
 
-    public function getNamespaceClass(): string
-    {
-        $configureParams = $this->configureParams;
-        $getExtendsModel = $configureParams->getExtendsModel();
-
-        return $this->getConfigureNamespace([
-            $getExtendsModel->getNamespace(),
-            $this->tableParams->getNamespace(),
-            $this->getDefaultClassName($getExtendsModel->getClassSuffix()),
-        ]);
-    }
-
+    /**
+     * 获取引入的包完整名称
+     *
+     * @return string
+     */
     public function getPackage(): string
     {
         $configureParams = $this->configureParams;
-        $getExtendsModel = $configureParams->getExtendsModel();
+        $getMakeParams = $configureParams->getExtendsModel();
 
         return $this->getConfigureNamespace([
-            $getExtendsModel->getNamespace(),
+            $getMakeParams->getNamespace(),
             $this->tableParams->getNamespace(),
-            $this->getDefaultClassName($getExtendsModel->getClassSuffix()),
+            $this->getDefaultClassName($getMakeParams->getClassSuffix()),
         ]);
     }
 

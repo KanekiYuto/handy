@@ -138,9 +138,7 @@ class MigrationMake extends Make
      */
     private function makeArrayParams(array $values): string
     {
-        $val = json_encode($values, JSON_UNESCAPED_UNICODE);
-
-        return Str::of($val)
+        return Str::of(json_encode($values, JSON_UNESCAPED_UNICODE))
             ->replace('"', '\'')
             ->replace(',', ', ')
             ->toString();
