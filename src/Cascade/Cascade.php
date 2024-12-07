@@ -5,13 +5,16 @@ namespace KanekiYuto\Handy\Cascade;
 use Closure;
 use KanekiYuto\Handy\Cascade\Make\ModelMake;
 use KanekiYuto\Handy\Cascade\Make\MigrationMake;
+use KanekiYuto\Handy\Cascade\Make\ModelActivity;
 use KanekiYuto\Handy\Cascade\Make\ExtendsModelMake;
 use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
+use Illuminate\Database\Eloquent\Model as LaravelEloquentModel;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
+use KanekiYuto\Handy\Foundation\Activity\Model as FoundationModelActivity;
 
 /**
  * Cascade
@@ -41,7 +44,14 @@ class Cascade
         $this->configureParams = new ConfigureParams();
         $this->tableParams = new TableParams('default', '');
         $this->migrationParams = new MigrationParams(null, '');
-        $this->modelParams = new ModelParams('', false, false);
+
+        $this->modelParams = new ModelParams(
+            LaravelEloquentModel::class,
+            new FoundationModelActivity(),
+            false,
+            false
+        );
+
         $this->blueprintParams = new BlueprintParams('default', '', fn() => null);
     }
 
@@ -88,22 +98,20 @@ class Cascade
     /**
      * 设置 - [Model]
      *
-     * @param  string  $extends
-     * @param  bool    $incrementing
-     * @param  bool    $timestamps
+     * @param  string         $extends
+     * @param  ModelActivity  $activity
+     * @param  bool           $incrementing
+     * @param  bool           $timestamps
      *
      * @return Cascade
      */
     public function withModel(
         string $extends,
+        ModelActivity $activity,
         bool $incrementing = false,
         bool $timestamps = false
     ): static {
-        $this->modelParams = new ModelParams(
-            $extends,
-            $incrementing,
-            $timestamps
-        );
+        $this->modelParams = new ModelParams($extends, $activity, $incrementing, $timestamps);
 
         return $this;
     }

@@ -9,7 +9,7 @@ use KanekiYuto\Handy\Trace\EloquentTrace;
  *
  * @author KanekiYuto
  */
-class {{ class }} extends TraceEloquent
+class {{ class }} extends EloquentTrace
 {
 
     /**
