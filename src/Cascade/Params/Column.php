@@ -11,9 +11,6 @@ class Column
 
     private string $comment;
 
-    /**
-     * @var MigrationParams[]
-     */
     private array $migrationParams;
 
     private bool $hidden;
@@ -27,7 +24,8 @@ class Column
         $this->field = $field;
         $this->comment = '';
         $this->cast = '';
-        $this->hide = false;
+        $this->hidden = false;
+        $this->fillable = false;
         $this->migrationParams = [];
     }
 
@@ -65,7 +63,7 @@ class Column
         return $this->comment;
     }
 
-    public function setComment(string $comment)
+    public function setComment(string $comment): static
     {
         $this->comment = $comment;
 

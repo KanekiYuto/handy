@@ -2,11 +2,26 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+/**
+ * 模型构建
+ *
+ * @author KanekiYuto
+ */
 class ModelMake extends CascadeMake
 {
 
+    /**
+     * 模型强制转换类型
+     *
+     * @var array
+     */
     private array $casts = [];
 
+    /**
+     * 模型包
+     *
+     * @var array
+     */
     private array $packages = [];
 
     public function boot(): void
@@ -21,6 +36,7 @@ class ModelMake extends CascadeMake
                 $this->tableParams->getNamespace(),
             ]);
 
+            $this->makeColumns();
             $this->stubParam('namespace', $namespace);
             $this->stubParam('class', $className);
             $this->stubParam('comment', '');
@@ -92,6 +108,15 @@ class ModelMake extends CascadeMake
         })->all();
 
         return implode("\n", $packages);
+    }
+
+    private function makeColumns(): void
+    {
+        $columns = $this->blueprintParams->getColumns();
+
+        foreach ($columns as $column) {
+            $this->casts[] = $column->getCast();
+        }
     }
 
 }
