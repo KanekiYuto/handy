@@ -4,7 +4,7 @@ namespace {{ namespace }};
 
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
-use KanekiYuto\Handy\Cascade\ModelActivity;
+use KanekiYuto\Handy\Activity\Eloquent\Activity as EloquentActivity;
 use {{ traceEloquent }} as TheEloquentTrace;
 use {{ activity }} as TheActivity;
 use {{ extends }} as Model;
@@ -29,9 +29,9 @@ class {{ class }} extends Model
     /**
      * 模型生命周期
      *
-     * @var ModelActivity
+     * @var EloquentActivity
      */
-    protected ModelActivity $modelActivity;
+    protected EloquentActivity $modelActivity;
 
     /**
      * 模型表名称
