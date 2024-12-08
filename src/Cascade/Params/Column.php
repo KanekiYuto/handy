@@ -7,79 +7,93 @@ use KanekiYuto\Handy\Cascade\Params\Migration as MigrationParams;
 class Column
 {
 
-	private string $field;
+    private string $field;
 
-	private string $comment;
+    private string $comment;
 
     /**
      * @var MigrationParams[]
-    */
-	private array $migrationParams;
+     */
+    private array $migrationParams;
 
-	private bool $hide;
+    private bool $hidden;
 
-	private string $cast;
+    private bool $fillable;
 
-	public function __construct(string $field)
-	{
-		$this->field = $field;
-		$this->comment = '';
-		$this->cast = '';
-		$this->hide = false;
-		$this->migrationParams = [];
-	}
+    private string $cast;
 
-	public function isHide(): bool
-	{
-		return $this->hide;
-	}
+    public function __construct(string $field)
+    {
+        $this->field = $field;
+        $this->comment = '';
+        $this->cast = '';
+        $this->hide = false;
+        $this->migrationParams = [];
+    }
 
-	public function setHide(bool $hide): static
-	{
-		$this->hide = $hide;
+    public function isFillable(): bool
+    {
+        return $this->fillable;
+    }
 
-		return $this;
-	}
+    public function setFillable(bool $value): static
+    {
+        $this->fillable = $value;
 
-	public function getField(): string
-	{
-		return $this->field;
-	}
+        return $this;
+    }
 
-	public function getComment(): string
-	{
-		return $this->comment;
-	}
+    public function setHidden(bool $value): static
+    {
+        $this->hidden = $value;
 
-	public function setComment(string $comment)
-	{
-		$this->comment = $comment;
+        return $this;
+    }
 
-		return $this;
-	}
+    public function isHidden(): bool
+    {
+        return $this->hidden;
+    }
 
-	public function getCast(): string
-	{
-		return $this->cast;
-	}
+    public function getField(): string
+    {
+        return $this->field;
+    }
 
-	public function setCast(string $cast): static
-	{
-		$this->cast = $cast;
+    public function getComment(): string
+    {
+        return $this->comment;
+    }
 
-		return $this;
-	}
+    public function setComment(string $comment)
+    {
+        $this->comment = $comment;
 
-	public function getMigrationParams(): array
-	{
-		return $this->migrationParams;
-	}
+        return $this;
+    }
 
-	public function addMigrationParams(MigrationParams $migrationParams): static
-	{
-		$this->migrationParams[] = $migrationParams;
+    public function getCast(): string
+    {
+        return $this->cast;
+    }
 
-		return $this;
-	}
+    public function setCast(string $cast): static
+    {
+        $this->cast = $cast;
+
+        return $this;
+    }
+
+    public function getMigrationParams(): array
+    {
+        return $this->migrationParams;
+    }
+
+    public function addMigrationParams(MigrationParams $migrationParams): static
+    {
+        $this->migrationParams[] = $migrationParams;
+
+        return $this;
+    }
 
 }

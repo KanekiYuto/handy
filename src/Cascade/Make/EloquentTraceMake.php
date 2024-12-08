@@ -99,9 +99,11 @@ class EloquentTraceMake extends CascadeMake
         $template[] = $this->templateConst($constantName, $field);
         $template = implode('', $template);
 
-        if ($column->isHide()) {
+        if ($column->isHidden()) {
             $this->hidden[] = $constantName;
-        } else {
+        }
+
+        if ($column->isFillable()) {
             $this->fillable[] = $constantName;
         }
 
