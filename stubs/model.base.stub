@@ -4,6 +4,7 @@ namespace {{ namespace }};
 
 use {{ extends }} as Model;
 use {{ traceEloquent }} as TheEloquentTrace;
+use {{ activity }} as TheActivity;
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
 

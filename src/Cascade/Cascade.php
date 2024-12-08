@@ -5,7 +5,6 @@ namespace KanekiYuto\Handy\Cascade;
 use Closure;
 use KanekiYuto\Handy\Cascade\Make\ModelMake;
 use KanekiYuto\Handy\Cascade\Make\MigrationMake;
-use KanekiYuto\Handy\Cascade\Make\ExtendsModelMake;
 use KanekiYuto\Handy\Cascade\Make\EloquentTraceMake;
 use KanekiYuto\Handy\Cascade\Params\Make\Model as ModelParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Table as TableParams;
@@ -46,10 +45,11 @@ class Cascade
 
         $this->modelParams = new ModelParams(
             LaravelEloquentModel::class,
-            new FoundationModelActivity(),
+            FoundationModelActivity::class,
             false,
             false
         );
+
         $this->blueprintParams = new BlueprintParams('default', '', fn() => null);
     }
 
@@ -96,16 +96,16 @@ class Cascade
     /**
      * 设置 - [Model]
      *
-     * @param  string         $extends
-     * @param  ModelActivity  $activity
-     * @param  bool           $incrementing
-     * @param  bool           $timestamps
+     * @param  string  $extends
+     * @param  string  $activity
+     * @param  bool    $incrementing
+     * @param  bool    $timestamps
      *
      * @return Cascade
      */
     public function withModel(
         string $extends,
-        ModelActivity $activity,
+        string $activity,
         bool $incrementing = false,
         bool $timestamps = false
     ): static {
@@ -159,14 +159,6 @@ class Cascade
         ))->boot();
 
         (new ModelMake(
-            $this->configureParams,
-            $this->blueprintParams,
-            $this->tableParams,
-            $this->modelParams,
-            $this->migrationParams
-        ))->boot();
-
-        (new ExtendsModelMake(
             $this->configureParams,
             $this->blueprintParams,
             $this->tableParams,

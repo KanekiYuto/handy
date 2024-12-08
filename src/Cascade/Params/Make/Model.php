@@ -2,20 +2,18 @@
 
 namespace KanekiYuto\Handy\Cascade\Params\Make;
 
-use KanekiYuto\Handy\Cascade\ModelActivity;
-
 class Model
 {
 
     private string $extends;
 
-    private ModelActivity $activity;
+    private string $activity;
 
     private bool $incrementing;
 
     private bool $timestamps;
 
-    public function __construct(string $extends, ModelActivity $activity, bool $incrementing, bool $timestamps)
+    public function __construct(string $extends, string $activity, bool $incrementing, bool $timestamps)
     {
         $this->extends = $extends;
         $this->incrementing = $incrementing;
@@ -28,7 +26,7 @@ class Model
         return $this->extends;
     }
 
-    public function getActivity(): ModelActivity
+    public function getActivity(): string
     {
         return $this->activity;
     }

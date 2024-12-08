@@ -4,7 +4,6 @@ namespace KanekiYuto\Handy\Cascade\Params;
 
 use KanekiYuto\Handy\Cascade\Params\Configure\Model;
 use KanekiYuto\Handy\Cascade\Params\Configure\Migration;
-use KanekiYuto\Handy\Cascade\Params\Configure\ExtendsModel;
 use KanekiYuto\Handy\Cascade\Params\Configure\EloquentTrace;
 
 class Configure
@@ -22,8 +21,6 @@ class Configure
 
     private Model $model;
 
-    private ExtendsModel $extendsModel;
-
     private Migration $migration;
 
     public function __construct()
@@ -34,7 +31,6 @@ class Configure
         $this->cascadeFilepath = $this->cascadeNamespace;
         $this->eloquentTrace = new EloquentTrace();
         $this->model = new Model();
-        $this->extendsModel = new ExtendsModel();
         $this->migration = new Migration();
     }
 
@@ -66,11 +62,6 @@ class Configure
     public function getModel(): Model
     {
         return $this->model;
-    }
-
-    public function getExtendsModel(): ExtendsModel
-    {
-        return $this->extendsModel;
     }
 
     public function getMigration(): Migration
