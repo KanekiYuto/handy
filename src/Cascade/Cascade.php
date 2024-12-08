@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model as LaravelEloquentModel;
 use KanekiYuto\Handy\Cascade\Params\Blueprint as BlueprintParams;
 use KanekiYuto\Handy\Cascade\Params\Configure as ConfigureParams;
 use KanekiYuto\Handy\Cascade\Params\Make\Migration as MigrationParams;
-use KanekiYuto\Handy\Foundation\Activity\Model as FoundationModelActivity;
+use KanekiYuto\Handy\Foundation\Activity\Eloquent\Activity as FoundationEloquentActivity;
 
 /**
  * Cascade
@@ -45,7 +45,7 @@ class Cascade
 
         $this->modelParams = new ModelParams(
             LaravelEloquentModel::class,
-            FoundationModelActivity::class,
+            FoundationEloquentActivity::class,
             false,
             false
         );

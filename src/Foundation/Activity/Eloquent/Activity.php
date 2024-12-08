@@ -1,19 +1,19 @@
 <?php
 
-namespace KanekiYuto\Handy\Foundation\Activity;
+namespace KanekiYuto\Handy\Foundation\Activity\Eloquent;
 
 use KanekiYuto\Handy\Support\Timestamp;
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
-use KanekiYuto\Handy\Cascade\ModelActivity;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
+use \KanekiYuto\Handy\Activity\Eloquent\Activity as EloquentActivity;
 
 /**
  * 基础的模型生命周期
  *
  * @author KanekiYuto
  */
-class Model extends ModelActivity
+class Activity extends EloquentActivity
 {
 
     /**

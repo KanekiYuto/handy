@@ -2,11 +2,12 @@
 
 namespace {{ namespace }};
 
-use {{ extends }} as Model;
-use {{ traceEloquent }} as TheEloquentTrace;
-use {{ activity }} as TheActivity;
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
+use KanekiYuto\Handy\Cascade\ModelActivity;
+use {{ traceEloquent }} as TheEloquentTrace;
+use {{ activity }} as TheActivity;
+use {{ extends }} as Model;
 
 {{ usePackages }}
 
