@@ -2,6 +2,8 @@
 
 namespace KanekiYuto\Handy\Cascade\Make;
 
+use Illuminate\Support\Str;
+
 /**
  * 模型构建
  *
@@ -66,6 +68,20 @@ class ModelMake extends CascadeMake
         });
     }
 
+    private function makeColumns(): void
+    {
+        $columns = $this->blueprintParams->getColumns();
+
+        foreach ($columns as $column) {
+            $field = $column->getField();
+
+            if (!empty($column->getCast())) {
+                $field = Str::upper($field);
+                $this->casts["TheEloquentTrace::$field"] = $column->getCast();
+            }
+        }
+    }
+
     private function makeCasts(): string
     {
         if (empty($this->casts)) {
@@ -108,15 +124,6 @@ class ModelMake extends CascadeMake
         })->all();
 
         return implode("\n", $packages);
-    }
-
-    private function makeColumns(): void
-    {
-        $columns = $this->blueprintParams->getColumns();
-
-        foreach ($columns as $column) {
-            $this->casts[] = $column->getCast();
-        }
     }
 
 }

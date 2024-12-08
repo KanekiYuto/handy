@@ -33,7 +33,6 @@ class PreacherResponse
 		$action = $route->getAction();
 
 		// 无论是控制器处理的请求还是闭包处理的请求，他们最终都应该被以闭包的方式返回
-		//
 		$handle = function (mixed $callable, Route $route) {
 			if ($callable instanceof PResponse) {
 				$route->uses(function () use ($callable) {

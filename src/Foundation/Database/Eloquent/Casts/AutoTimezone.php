@@ -1,6 +1,6 @@
 <?php
 
-namespace KanekiYuto\Handy\Foundation\Cast;
+namespace KanekiYuto\Handy\Foundation\Database\Eloquent\Casts;
 
 use Exception;
 use DateTimeZone;
@@ -8,17 +8,18 @@ use DateTimeImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Request;
 use KanekiYuto\Handy\Support\IdeIgnore;
+use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 
 /**
- * Automatic time zone switching
+ * [Eloquent - Cast] 自动时间转换
  *
  * @author KanekiYuto
  */
-class AutoTimezone
+class AutoTimezone implements CastsAttributes
 {
 
     /**
-     * The extracted data is converted
+     * 对提取的数据进行转换
      *
      * @param  Model   $model
      * @param  string  $key
@@ -43,7 +44,7 @@ class AutoTimezone
     }
 
     /**
-     * Convert to a value that will be stored
+     * 转换为将被存储的值
      *
      * @param  Model   $model
      * @param  string  $key

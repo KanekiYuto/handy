@@ -5,7 +5,7 @@ namespace KanekiYuto\Handy\Activity\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use KanekiYuto\Handy\Trace\EloquentTrace;
-use KanekiYuto\Handy\Activity\Contract\Eloquent as ActivityContractEloquent;
+use KanekiYuto\Handy\Contracts\Activity\Eloquent as ActivityContractEloquent;
 
 /**
  * [Eloquent] activity abstract class

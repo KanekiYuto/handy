@@ -1,6 +1,6 @@
 <?php
 
-namespace KanekiYuto\Handy\Activity\Contract;
+namespace KanekiYuto\Handy\Contracts\Activity;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;

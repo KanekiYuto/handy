@@ -7,7 +7,7 @@ use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\warning;
 
 /**
- * Command line acknowledgment
+ * 命令行确认
  *
  * @author KanekiYuto
  */
@@ -15,15 +15,15 @@ trait ConfirmableTrait
 {
 
 	/**
-	 * Confirm before proceeding
-	 *
+	 * 继续前确认
+     *
 	 * @param  string  $warning
 	 * @param  bool|Closure|null  $callback
 	 *
 	 * @return bool
 	 */
 	public function confirmToProceed(
-		string $warning = 'The application is currently in production！！！',
+		string $warning = '该应用程序目前处于生产状态！',
 		bool|Closure $callback = null
 	): bool {
 		$callback = is_null($callback) ? $this->getDefaultConfirmCallback() : $callback;
@@ -37,10 +37,10 @@ trait ConfirmableTrait
 
 			warning($warning);
 
-			$confirmed = confirm('Are you sure you want to run this command?', default: false);
+			$confirmed = confirm('您确定要运行这个命令吗？', default: false);
 
 			if (!$confirmed) {
-				$this->components->warn('Cancel.');
+				$this->components->warn('取消。');
 
 				return false;
 			}
@@ -50,14 +50,14 @@ trait ConfirmableTrait
 	}
 
 	/**
-	 * Gets the default confirmation callback
+	 * 获取默认确认回调
 	 *
 	 * @return Closure
 	 */
 	protected function getDefaultConfirmCallback(): Closure
 	{
 		return function () {
-			// Determine whether the current environment is in production
+			// 确定当前环境是否在生产中
 			return $this->getLaravel()->environment() === 'production';
 		};
 	}
