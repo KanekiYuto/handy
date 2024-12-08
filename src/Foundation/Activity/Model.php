@@ -25,7 +25,7 @@ class Model extends ModelActivity
      *
      * @return bool
      */
-    protected function performInsert(EloquentModel $model, Builder $query, EloquentTrace $eloquentTrace): bool
+    public function performInsert(EloquentModel $model, Builder $query, EloquentTrace $eloquentTrace): bool
     {
         $model->setAttribute($model->getKeyName(), Timestamp::millisecond());
         $model->setAttribute($model::CREATED_AT, Timestamp::second());
@@ -43,7 +43,7 @@ class Model extends ModelActivity
      *
      * @return bool
      */
-    protected function performUpdate(EloquentModel $model, Builder $query, EloquentTrace $eloquentTrace): bool
+    public function performUpdate(EloquentModel $model, Builder $query, EloquentTrace $eloquentTrace): bool
     {
         $model->setAttribute($model::UPDATED_AT, Timestamp::second());
 

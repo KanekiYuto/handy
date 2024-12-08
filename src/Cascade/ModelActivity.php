@@ -23,7 +23,7 @@ abstract class ModelActivity
      *
      * @return bool
      */
-    abstract protected function performInsert(Model $model, Builder $query, EloquentTrace $eloquentTrace): bool;
+    abstract public function performInsert(Model $model, Builder $query, EloquentTrace $eloquentTrace): bool;
 
     /**
      * 模型更新前的操作
@@ -34,6 +34,6 @@ abstract class ModelActivity
      *
      * @return bool
      */
-    abstract protected function performUpdate(Model $model, Builder $query, EloquentTrace $eloquentTrace): bool;
+    abstract public function performUpdate(Model $model, Builder $query, EloquentTrace $eloquentTrace): bool;
 
 }
